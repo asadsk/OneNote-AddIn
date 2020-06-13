@@ -8,7 +8,7 @@ const useStyles = makeStyles(theme => ({
         padding: 8
     }
 }));
-const TabPanel = props => {
+const SubTabPanel = props => {
     const classes = useStyles();
     const { children, value, index, ...other } = props;
 
@@ -30,4 +30,4 @@ const TabPanel = props => {
     );
 };
 
-export default TabPanel;
+export default SubTabPanel;
