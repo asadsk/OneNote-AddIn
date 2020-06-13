@@ -1,31 +1,25 @@
 import * as React from "react";
 import "date-fns";
-import Autocomplete from "./Autocomplete";
+import Autocomplete from "./Autocomplete"; //Other autocomplete component
 import AutocompleteComponent from "./AutocompleteComponent";
-import Template from "./Template";
-import TextFields from "./TextFields";
+import Template from "./Template"
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TabPanel from "./Tab";
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from "@material-ui/pickers";
+import SubTabPanel from "./SubTab";
 import DateFnsUtils from "@date-io/date-fns";
 import Container from "@material-ui/core/Container";
 import AddIcon from "@material-ui/icons/Add";
 import { purple } from "@material-ui/core/colors";
 import Grid from "@material-ui/core/Grid";
-import InputLabel from "@material-ui/core/InputLabel";
-import TextField from "@material-ui/core/TextField";
-import { Tabs, Tab } from "@material-ui/core";
+import { Tabs, Tab, Divider } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
+import { userService } from "../../services"
 import { makeStyles } from "@material-ui/core/styles";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core";
+import { constants } from "../../constants";
 //import Progress from "./Progress";
 /* global Button, Header, HeroList, HeroListItem, Progress */
 
@@ -35,7 +29,16 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired
 };
 
+SubTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.any.isRequired,
+  value: PropTypes.any.isRequired
+};
+
 const themeObject = createMuiTheme({
+  typography: {
+    fontFamily: "Raleway, Arial"
+  },
   palette: {
     primary: { main: purple[700], light: purple[100], dark: purple[800] },
     secondary: {
@@ -53,16 +56,8 @@ const useStyles = makeStyles(theme => ({
     minWidth: 245,
     marginBottom: 0
   },
-  selectEmpty: {
-    marginTop: theme.spacing(0.5)
-  },
-  button: {
-    marginLeft: 88,
-    marginRight: 88,
-    marginTop: 8
-  },
   tagButton: {
-    marginLeft: 63,
+    marginLeft: 76,
     marginRight: 44,
     marginTop: 8
   },
@@ -71,53 +66,20 @@ const useStyles = makeStyles(theme => ({
     overflow: "auto",
     flexDirection: "column"
   },
-  datePicker: {
-    color: purple[600],
-    minWidth: 120,
-    marginTop: theme.spacing(0.5)
-  },
-  textfield: {
-    minWidth: 120,
-    marginTop: theme.spacing(1)
-  },
   container: {
     alignItems: "center"
   },
-  checkbox: {
-    fontSize: "0.8rem"
+  subtabs: {
+    minHeight: 36
   }
 }));
 const App = props => {
-  const [type, setType] = useState();
   const [value, setValue] = useState(0);
-  const [noteType, setNoteType] = useState();
-  const [contentObj, setContentObj] = useState({
-    financialDate: {
-      date: "",
-      period: ""
-    },
-    companyName: "",
-    mandatoryOutlines: {
-      riskCommentary: true,
-      marketCommentary: true
-    }
-  });
+  const [subTabValue, setsubTabValue] = useState(0);
   const [tags, setTags] = useState({
     tagdata: []
   });
 
-  function handleDateChange(date) {
-    debugger;
-    //setSelectedDate(value);
-    console.log(selectedDate);
-    var day = date.getDate();
-    var month = date.getMonth() + 1;
-    var year = date.getFullYear();
-    var myDate = month + "/" + day + "/" + year;
-    var period = Math.floor((date.getMonth() + 3) / 3);
-    var financialDateObj = { date: myDate, period: period };
-    setContentObj(content => ({ ...content, financialDate: financialDateObj }));
-  }
   const classes = useStyles();
   // if (!props.isOfficeInitialized) {
   //   return (
@@ -138,201 +100,19 @@ const App = props => {
       // }
       var page = context.application.getActivePage();
       var tagString = "";
-      tags.tagdata.forEach(function(entry) {
+      tags.tagdata.forEach(function (entry) {
         tagString += "<p><B><I>" + entry.name + "</B></I></p>";
       });
       var table = "<p></p>";
       page.addOutline(520, 0, tagString);
-    }).catch(function(error) {
+    }).catch(function (error) {
       console.log("Error: " + error);
       if (error instanceof OfficeExtension.Error) {
         console.log("Debug info: " + JSON.stringify(error.debugInfo));
       }
     });
   }
-  async function click() {
-    await OneNote.run(async context => {
-      // Queue a command to add a page to the current section.
-      var section = context.application.getActiveSection();
-      var page = context.application.getActivePage();
-      // var pageContents = context.application.getActivePageOrNull().contents;
-      // var pageContent = pageContents.getItem(0);
-      // if (pageContent.outline) {
-      //   var paragraphs = pageContent.outline.paragraphs;
-      // }
-      //var firstParagraph = paragraphs.items[0];
 
-      var date = contentObj.financialDate.date;
-      var period = "Q" + contentObj.financialDate.period;
-      if (!date) {
-        var today = new Date();
-        var day = today.getDate();
-        var month = today.getMonth() + 1;
-        var year = today.getFullYear();
-        date = month + "/" + day + "/" + year;
-        period = "Q" + Math.floor((today.getMonth() + 3) / 3);
-      }
-
-      var companyName = contentObj.companyName;
-      var riskCommentary = contentObj.mandatoryOutlines.riskCommentary;
-      var marketCommentary = contentObj.mandatoryOutlines.marketCommentary;
-      // var items = [
-      //   ["Financial Date:", date],
-      //   ["Period:", period]
-      // ];
-      // firstParagraph.insertTableAsSibling("Before", 2, 2, items);
-
-      console.log(tags);
-      page.addOutline(40, 70, "<p></p>");
-      return context.sync().then(function() {
-        var pageContents = page.contents;
-
-        // Queue a command to load the pageContents to access its data.
-        context.load(pageContents);
-        // return context.sync().then(function() {
-        //   if (pageContents.items.length != 0) {
-        //     pageContents.items[0].delete();
-        //   }
-        //   context.load(pageContents);
-        //   return context.sync().then(function() {
-        //     if (pageContents.items.length == 0) {
-        //       page.addOutline(40, 70, "<p></p>");
-        //     }
-        //     var newContent = page.contents;
-        //     context.load(newContent);
-        return context.sync().then(function() {
-          if (pageContents.items.length != 0 && pageContents.items[0].type == "Outline") {
-            // First item is an outline.
-            var outline = pageContents.items[0].outline;
-
-            // Queue a command to append a paragraph to the outline.
-            //outline.appendHtml("<p>new paragraph</p>");
-
-            if (type === "earningsUpdate") {
-              outline.appendHtml(
-                "<table border='border-collapse'> \
-            <tr> \
-              <td style='border: 1px solid black;'><B><I>##Financial Date: </I></B></td> \
-              <td style='border: 1px solid black;'>" +
-                  date +
-                  "</td> \
-            </tr> \
-            <tr> \
-              <td style='border: 1px solid black;'><B><I>##Period: </I></B></td> \
-              <td style='border: 1px solid black;'>" +
-                  period +
-                  "</td> \
-            </tr> \
-            <tr> \
-              <td style='border: 1px solid black;'><B><I>##Company: </I></B></td> \
-              <td style='border: 1px solid black;'>" +
-                  companyName +
-                  "</td> \
-            </tr> \
-          </table>"
-              );
-              if (riskCommentary && marketCommentary) {
-                page.addOutline(
-                  40,
-                  160,
-                  "<table border='border-collapse'> \
-              <tr> \
-                  <td style='border: 1px solid black;'><B><I>##Risk Commentary: </I></B></td> \
-                  <td style='border: 1px solid black;'></td> \
-                </tr> \
-                </table>"
-                );
-                page.addOutline(
-                  40,
-                  220,
-                  "<table border='border-collapse'> \
-                <tr> \
-                <td style='border: 1px solid black;'><B><I>##Market Commentary: </I></B></td> \
-                <td style='border: 1px solid black;'></td> \
-              </tr> \
-              </table>"
-                );
-              }
-              if (riskCommentary && !marketCommentary) {
-                page.addOutline(
-                  40,
-                  160,
-                  "<table border='border-collapse'> \
-              <tr> \
-                  <td style='border: 1px solid black;'><B><I>##Risk Commentary: </I></B></td> \
-                  <td style='border: 1px solid black;'></td> \
-                </tr> \
-              </table>"
-                );
-              }
-              if (!riskCommentary && marketCommentary) {
-                page.addOutline(
-                  40,
-                  160,
-                  "<table border='border-collapse'> \
-              <tr> \
-                  <td style='border: 1px solid black;'><B><I>##Market Commentary: </I></B></td> \
-                  <td style='border: 1px solid black;'></td> \
-                </tr> \
-              </table>"
-                );
-              }
-            } else if (type === "managementCall") {
-              outline.appendHtml(
-                "<table border='border-collapse'> \
-            <tr> \
-                <td style='border: 1px solid black;'><B><I>##Company: </I></B></td> \
-                <td style='border: 1px solid black;'>" +
-                  companyName +
-                  "</td> \
-              </tr> \
-            </table>"
-              );
-            } else {
-              outline.appendHtml(
-                "<table border='border-collapse'> \
-            <tr> \
-                <td style='border: 1px solid black;'><B><I>##Company: </I></B></td> \
-                <td style='border: 1px solid black;'>" +
-                  companyName +
-                  "</td> \
-              </tr> \
-            </table>"
-              );
-            }
-
-            return context.sync();
-          }
-          //   });
-          // });
-        });
-      });
-    }).catch(function(error) {
-      console.log("Error: " + error);
-      if (error instanceof OfficeExtension.Error) {
-        console.log("Debug info: " + JSON.stringify(error.debugInfo));
-      }
-    });
-  }
-  function handleChange(event) {
-    setType(event.target.value);
-    if (event.target.value === "earningsUpdate") {
-      setNoteType(<Template contentObj={contentObj} />);
-    } else if (event.target.value === "managementCall") {
-      setNoteType(
-        <TextField
-          onChange={handleTextChange}
-          className={classes.textfield}
-          size="small"
-          required
-          id="text-management-call"
-          label="Enter Agenda"
-        />
-      );
-    } else {
-      setNoteType(<TextFields contentObj={contentObj} />);
-    }
-  }
   function handleSubtypeChange() {
     setSubType(event.target.value);
   }
@@ -344,14 +124,27 @@ const App = props => {
     };
   }
 
+  function a11ySubTabProps(index) {
+    return {
+      id: `simple-subtab-${index}`,
+      "aria-controls": `simple-subtabpanel-${index}`
+    };
+  }
+
   const handleTabChange = (event, newValue) => {
+    debugger;
     setValue(newValue);
   };
 
-  const handleTextChange = event => {
+  const handleSubTabChange = (event, newValue) => {
+    //alert('I am in');
     debugger;
-    setContentObj(contentObj => ({ ...contentObj, companyName: event.target.value }));
+    if (event.target.textContent == constants.ASSET_TAB) {
+      console.log(event.target.textContent)
+    }
+    setsubTabValue(newValue);
   };
+
   return (
     <MuiThemeProvider theme={themeObject}>
       <div className="ms-welcome">
@@ -366,30 +159,33 @@ const App = props => {
                   </Tabs>
                 </AppBar>
                 <TabPanel value={value} index={0}>
-                  <FormControl className={classes.formControl}>
-                    <InputLabel shrink id="noteTypeLabel">
-                      Select Note Type*
-                    </InputLabel>
-                    <Select value={type} onChange={handleChange} displayEmpty className={classes.selectEmpty}>
-                      <MenuItem value="earningsUpdate">Earnings Update</MenuItem>
-                      <MenuItem value="generalNews">General News</MenuItem>
-                      <MenuItem value="managementCall">Management Call</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <FormControl className={classes.formControl}>{noteType}</FormControl>
-                  <Button
-                    type="submit"
-                    variant="outlined"
-                    color="primary"
-                    className={classes.button}
-                    endIcon={<AddIcon />}
-                    onClick={click}
-                  >
-                    ADD
-                  </Button>
+                  {Template}
                 </TabPanel>
+                <Divider />
                 <TabPanel value={value} index={1}>
-                  <AutocompleteComponent tags={tags} />
+                  <Tabs
+                    //orientation="vertical"
+                    variant="fullWidth"
+                    value={subTabValue}
+                    onChange={handleSubTabChange}
+                    aria-label="tags subtabs"
+                    indicatorColor="primary"
+                  //className={classes.tagsPanel}
+                  >
+                    <Tab disableRipple className={classes.subtabs} label="Static" {...a11ySubTabProps(0)} />
+                    <Tab disableRipple className={classes.subtabs} label="Issuer" {...a11ySubTabProps(1)} />
+                    <Tab disableRipple className={classes.subtabs} label="Asset" {...a11ySubTabProps(2)} />
+                  </Tabs>
+                  <SubTabPanel value={subTabValue} index={0}>
+                    <AutocompleteComponent tags={tags} />
+                  </SubTabPanel>
+                  <SubTabPanel value={subTabValue} index={1}>
+                    <AutocompleteComponent tags={tags} />
+                  </SubTabPanel>
+                  <SubTabPanel value={subTabValue} index={2}>
+                    <AutocompleteComponent tags={tags} />
+                  </SubTabPanel>
+
                   <Button
                     type="submit"
                     variant="outlined"

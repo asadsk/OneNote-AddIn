@@ -3,15 +3,25 @@ import Chip from "@material-ui/core/Chip";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
+import ListSubheader from "@material-ui/core/ListSubheader";
 import { useState, useEffect } from "react";
 const useStyles = makeStyles(theme => ({
   root: {
     width: 250,
+    marginLeft: 8,
+    marginTop: 8,
     "& > * + *": {
       marginTop: theme.spacing(1)
+    },
+    groupLabel: {
+      fontSize: 30
     }
   },
-  textfield: {}
+  autocomplete: {
+    groupLabel: {
+      fontSize: 30
+    }
+  }
 }));
 
 export const AutocompleteComponent = props => {
@@ -21,10 +31,17 @@ export const AutocompleteComponent = props => {
   props.tags.tagdata = tags;
 
   console.log(tags);
+  const renderGroup = params => [
+    <ListSubheader key={params.key} component="div">
+      {params.key}
+    </ListSubheader>,
+    params.children
+  ];
 
   return (
     <div className={classes.root}>
       <Autocomplete
+        className={classes.autocomplte}
         multiple
         id="autocomplete-tags"
         size="small"
@@ -33,21 +50,30 @@ export const AutocompleteComponent = props => {
           setTags(newValue);
         }}
         getOptionLabel={option => option.name}
+        groupBy={option => option.color}
         renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
       />
     </div>
   );
 };
 
+// const options = labels.map(option => {
+//   const firstLetter = option.title[0].toUpperCase();
+//   return {
+//     firstLetter: /[0-9]/.test(firstLetter) ? "0-9" : firstLetter,
+//     ...option
+//   };
+// });
+
 const labels = [
   {
-    name: "#Security",
-    color: "#7057ff",
+    name: "Primary Identfier: BL1229162",
+    color: "BL1229162",
     description: ""
   },
   {
-    name: "#AssetType",
-    color: "#008672",
+    name: "Description: TL 1L EUR",
+    color: "BL1229162",
     description: ""
   },
   {
