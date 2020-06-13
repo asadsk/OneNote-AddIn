@@ -124,12 +124,20 @@ const App = props => {
     };
   }
 
+  function a11ySubTabProps(index) {
+    return {
+      id: `simple-subtab-${index}`,
+      "aria-controls": `simple-subtabpanel-${index}`
+    };
+  }
+
   const handleTabChange = (event, newValue) => {
     debugger;
     setValue(newValue);
   };
 
   const handleSubTabChange = (event, newValue) => {
+    //alert('I am in');
     debugger;
     if (event.target.textContent == constants.ASSET_TAB) {
       console.log(event.target.textContent)
@@ -164,9 +172,9 @@ const App = props => {
                     indicatorColor="primary"
                   //className={classes.tagsPanel}
                   >
-                    <Tab disableRipple className={classes.subtabs} label="Static" {...a11yProps(0)} />
-                    <Tab disableRipple className={classes.subtabs} label="Issuer" {...a11yProps(1)} />
-                    <Tab disableRipple className={classes.subtabs} label="Asset" {...a11yProps(2)} />
+                    <Tab disableRipple className={classes.subtabs} label="Static" {...a11ySubTabProps(0)} />
+                    <Tab disableRipple className={classes.subtabs} label="Issuer" {...a11ySubTabProps(1)} />
+                    <Tab disableRipple className={classes.subtabs} label="Asset" {...a11ySubTabProps(2)} />
                   </Tabs>
                   <SubTabPanel value={subTabValue} index={0}>
                     <AutocompleteComponent tags={tags} />
