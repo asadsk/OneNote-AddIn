@@ -10,7 +10,7 @@ export const userService = {
 async function getAllAssetTags() {
   debugger;
   const assetTags = await restApis._getAll(
-    "https://localhost:44329/api/OneNoteAddIn/FilteredPages"
+    "https://localhost:5001/api/OneNoteAddIn/GetAllAssetTags"
   );
 
   return assetTags;
@@ -19,7 +19,7 @@ async function getAllAssetTags() {
 async function getAllIssuerTags() {
   debugger;
   const issuerTags = await restApis._getAll(
-    "https://localhost:44329/api/OneNoteAddIn/FilteredPages"
+    "https://localhost:5001/api/OneNoteAddIn/GetAllIssuerTags"
   );
 
   return issuerTags;
