@@ -28,12 +28,20 @@ async function getAllIssuerTags() {
 async function getAllStaticTags() {
   debugger;
   const staticTags = await restApis._getAll(
-    "https://localhost:44329/api/OneNoteAddIn/FilteredPages"
+    "https://localhost:5001/api/OneNoteAddIn/GetAllStaticTags"
   );
 
   return staticTags;
 }
 
+async function getAllSavedTags() {
+  debugger;
+  const staticTags = await restApis._getAll(
+    "https://localhost:5001/api/OneNoteAddIn/GetAllStaticTags"
+  );
+
+  return staticTags;
+}
 
 
 async function getOneNote() {

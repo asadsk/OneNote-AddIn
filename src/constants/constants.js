@@ -1,5 +1,10 @@
 export const constants = {
     ASSET_TAB: "Asset",
     ISSUER_TAB: "Issuer",
-    STATIC_TAB: "Static"
+    STATIC_TAB: "Static",
+    SAVE_ASSET_TAGS: "SAVE_ASSET_TAGS",
+    SAVE_ISSUER_TAGS: "SAVE_ISSUER_TAGS",
+    SAVE_STATIC_TAGS: "SAVE_STATIC_TAGS",
+    ADD_NEW_TAG: "ADD_NEW_TAG",
+    DELETE_TAG: "DELETE_TAG"
 };

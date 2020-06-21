@@ -6,6 +6,9 @@ import TextField from "@material-ui/core/TextField";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import { useState, useEffect } from "react";
 import { constants } from "../../constants";
+import { useSelector, useDispatch } from "react-redux";
+import { userActions } from '../../actions';
+import { Typography } from "@material-ui/core";
 const useStyles = makeStyles(theme => ({
   root: {
     width: 230,
@@ -34,57 +37,62 @@ export const AutocompleteComponent = props => {
   const [tags, setTags] = useState();
   //const [tagData, setTagData] = useState();
   const classes = useStyles();
+  const dispatch = useDispatch();
+  const tagState = useSelector(state => state.tags);
+  let loadedAssetTags;
+  let loadedIssuerTags;
+  let loadedStaticTags;
+  debugger;
+  if (tagState) {
+    if (tagState.assetTags) {
+      loadedAssetTags = tagState.assetTags
+    }
+    if (tagState.issuerTags) {
+      loadedIssuerTags = tagState.issuerTags
+    }
+    if (tagState.staticTags) {
+      loadedStaticTags = tagState.staticTags
+    }
+  }
   const theme = useTheme();
   debugger;
   props.tags.tagdata = tags;
   //setTagData(props.tagData);
-  let tagData = props.tagData;
+  //let tagData = props.tagData;
   const subTab = props.subTab
   let autocomplete;
-  if (!tagData) {
-    tagData = dummy;
-  }
+
   if (subTab) {
     if (subTab == constants.ASSET_TAB) {
-      autocomplete = <Autocomplete
-        className={classes.autocomplte}
-        id="autocomplete-tags"
-        size="small"
-        options={tagData}
-        onChange={(event, newValue) => {
-          setTags(newValue);
-        }}
-        getOptionLabel={option => option.PrimaryIdentifier}
-        groupBy={option => option.PrimaryIdentifier}
-        renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
-        renderGroup={params => <TextField {...params} />}
-      // renderOption={(option, { inputValue }) => {
-      //   const matches = match(option.title, inputValue);
-      //   const parts = parse(option.title, matches);
-      //   return (
-      //     <div>
-      //       {parts.map((part, index) => (
-      //         <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
-      //           {part.text}
-      //         </span>
-      //       ))}
-      //     </div>
-      //   );
-      // }}
-      />
-    }
-    else if (subTab == constants.ISSUER_TAB) {
       autocomplete = <Autocomplete
         className={classes.autocomplte}
         multiple
         id="autocomplete-tags"
         size="small"
-        options={tagData}
+        options={loadedAssetTags}
         onChange={(event, newValue) => {
           setTags(newValue);
+          dispatch(userActions.addNewTag(newValue));
         }}
-        getOptionLabel={option => option.IssuerName}
-        groupBy={option => option.IssuerName}
+        getOptionLabel={option => option.TagName}
+        groupBy={option => option.UniqueIdentifier}
+        renderInput={params => <Typography variant="caption"><TextField {...params} variant="outlined" label="Search Tags.." /></Typography>}
+      />
+    }
+    else if (subTab == constants.ISSUER_TAB) {
+      debugger;
+      autocomplete = <Autocomplete
+        className={classes.autocomplte}
+        multiple
+        id="autocomplete-tags"
+        size="small"
+        options={loadedIssuerTags}
+        onChange={(event, newValue) => {
+          setTags(newValue);
+          dispatch(userActions.addNewTag(newValue));
+        }}
+        getOptionLabel={option => option.TagName}
+        groupBy={option => option.UniqueIdentifier}
         renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
       />
     }
@@ -94,33 +102,18 @@ export const AutocompleteComponent = props => {
         multiple
         id="autocomplete-tags"
         size="small"
-        options={dummy}
+        options={loadedStaticTags}
         onChange={(event, newValue) => {
           setTags(newValue);
+          dispatch(userActions.addNewTag(newValue));
         }}
-        getOptionLabel={option => option.PrimaryIdentifier}
-        groupBy={option => option.PrimaryIdentifier}
+        getOptionLabel={option => option.TagName}
+        groupBy={option => option.UniqueIdentifier}
         renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
       />
     }
   }
-  else {
-    autocomplete = <Autocomplete
-      className={classes.autocomplte}
-      multiple
-      id="autocomplete-tags"
-      size="small"
-      options={dummy}
-      onChange={(event, newValue) => {
-        setTags(newValue);
-      }}
-      getOptionLabel={option => option.PrimaryIdentifier}
-      groupBy={option => option.PrimaryIdentifier}
-      renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
-    />
-  }
 
-  console.log(tags);
   const renderGroup = params => [
     <ListSubheader key={params.key} component="div">
       {params.key}
@@ -138,19 +131,6 @@ export const AutocompleteComponent = props => {
   );
 };
 
-// const options = labels.map(option => {
-//   const firstLetter = option.title[0].toUpperCase();
-//   return {
-//     firstLetter: /[0-9]/.test(firstLetter) ? "0-9" : firstLetter,
-//     ...option
-//   };
-// });
-const dummy = [
-  {
-    PrimaryIdentifier: "BL1229162",
-    Description: "description"
-  }
-]
 
 
 export default AutocompleteComponent;
