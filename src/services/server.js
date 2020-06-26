@@ -4,11 +4,13 @@ export const userService = {
   getAllAssetTags,
   getAllIssuerTags,
   getAllStaticTags,
-  getOneNote
+  saveTags,
+  getAllTemplates,
+  getTemplateFields,
+  getAllSavedTags
 };
 
 async function getAllAssetTags() {
-  debugger;
   const assetTags = await restApis._getAll(
     "https://localhost:5001/api/OneNoteAddIn/GetAllAssetTags"
   );
@@ -17,7 +19,6 @@ async function getAllAssetTags() {
 }
 
 async function getAllIssuerTags() {
-  debugger;
   const issuerTags = await restApis._getAll(
     "https://localhost:5001/api/OneNoteAddIn/GetAllIssuerTags"
   );
@@ -26,7 +27,6 @@ async function getAllIssuerTags() {
 }
 
 async function getAllStaticTags() {
-  debugger;
   const staticTags = await restApis._getAll(
     "https://localhost:5001/api/OneNoteAddIn/GetAllStaticTags"
   );
@@ -34,25 +34,40 @@ async function getAllStaticTags() {
   return staticTags;
 }
 
-async function getAllSavedTags() {
-  debugger;
-  const staticTags = await restApis._getAll(
-    "https://localhost:5001/api/OneNoteAddIn/GetAllStaticTags"
+async function getAllSavedTags(activePageId) {
+  const staticTags = await restApis._get(
+    "https://localhost:5001/api/OneNoteAddIn/GetAllSavedTags?" + new URLSearchParams({
+      noteId: activePageId
+    })
   );
 
   return staticTags;
 }
 
-
-async function getOneNote() {
-  debugger;
-  var payload = {
-    Section: null,
-    SectionGroup: null,
-    NoteBook: null,
-    Page: null
-  };
-  return await restApis._getAll(
-    "https://localhost:44329/api/OneNote/FilteredPages"
+async function saveTags(tags) {
+  const staticTags = await restApis._post(
+    "https://localhost:5001/api/OneNoteAddIn/SaveTags", tags
   );
+
+  return staticTags;
 }
+
+async function getAllTemplates() {
+  const templates = await restApis._getAll(
+    "https://localhost:5001/api/OneNoteAddIn/GetAllNoteTemplates"
+  );
+
+  return templates;
+}
+
+async function getTemplateFields(templateId) {
+  const templates = await restApis._get(
+    "https://localhost:5001/api/OneNoteAddIn/GetTemplateFields?" + new URLSearchParams({
+      id: templateId
+    })
+  );
+
+  return templates;
+}
+
+

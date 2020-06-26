@@ -5,8 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    //padding: 8
-    width: 250
+    padding: 8
   }
 }));
 const TabPanel = props => {

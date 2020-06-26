@@ -133,7 +133,6 @@ export default function GitHubLabel() {
   const theme = useTheme();
 
   const handleClick = event => {
-    debugger;
     setPendingValue(value);
     setAnchorEl(event.currentTarget);
   };

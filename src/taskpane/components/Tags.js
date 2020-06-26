@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TabPanel from "./Tab";
 import SubTabPanel from "./SubTab";
+import Box from '@material-ui/core/Box'
 import Chip from '@material-ui/core/Chip';
 import Container from "@material-ui/core/Container";
 import AddIcon from "@material-ui/icons/Add";
@@ -21,6 +22,8 @@ import { MuiThemeProvider, createMuiTheme } from "@material-ui/core";
 import { constants } from "../../constants";
 import { useSelector, useDispatch } from "react-redux";
 import { userActions } from '../../actions';
+import $ from 'jquery';
+//import 'core-js/es/array'
 //import Progress from "./Progress";
 /* global Button, Header, HeroList, HeroListItem, Progress */
 
@@ -58,8 +61,8 @@ const useStyles = makeStyles(theme => ({
         marginBottom: 0
     },
     tagButton: {
-        //margin: "auto",
-        //margin: theme.spacing(1),
+        marginLeft: 56,
+        marginTop: theme.spacing(1)
     },
     paper: {
         display: "flex",
@@ -71,7 +74,6 @@ const useStyles = makeStyles(theme => ({
         overflow: "auto",
         flexDirection: "column",
         marginTop: theme.spacing(1),
-        width: "84%",
         minHeight: 150,
         padding: 5
     },
@@ -79,9 +81,7 @@ const useStyles = makeStyles(theme => ({
         display: "flex",
         overflow: "auto",
         flexDirection: "column",
-        width: "84%",
         marginTop: theme.spacing(1),
-        maxHeight: 150,
         minHeight: 150,
         padding: 5
     },
@@ -107,7 +107,8 @@ const useStyles = makeStyles(theme => ({
 
     },
     chips: {
-        height: 20
+        height: 20,
+        fontSize: 12
     }
 }));
 
@@ -119,20 +120,60 @@ const Tags = props => {
     const [value, setValue] = useState(0);
     const [subTabValue, setSubTabValue] = useState(0);
     const [subTabText, setSubTabText] = useState();
+    const [activePage, setActivePage] = useState();
     const [tags, setTags] = useState({
         tagdata: []
     });
+    const [savedTags, setSavedTags] = useState([]);
+    const [tagsSaved, setTagsSaved] = useState(false);
 
     const classes = useStyles();
     const dispatch = useDispatch();
     const tagState = useSelector(state => state.tags);
     const theme = useTheme();
-    debugger;
+    const chipBox = {
+        bgcolor: 'background.paper',
+        m: 1,
+        border: 1,
+        //marginTop: 2
+        //style: { width: '5rem', height: '5rem' }
+    }
     let loadedAssetTags;
     let loadedIssuerTags;
     let loadedStaticTags;
-    debugger;
-    if (tagState) {
+    const selectedTags = tagState.savedTags;
+
+    const groupedTags = selectedTags && groupBy(selectedTags, 'UniqueIdentifier');
+    console.log(groupedTags);
+    function groupBy(array, key) {
+        // Return the end result
+        return array.reduce((result, currentValue) => {
+            // If an array already present for key, push it to the array. Else create an array and push the object
+            (result[currentValue[key]] = result[currentValue[key]] || []).push(
+                currentValue
+            );
+            // Return the current iteration `result` value, this will be taken as next iteration `result` value and accumulate
+            return result;
+        }, {}); // empty object is the initial value for result object
+    };
+    /* Use Effect to update the active page state */
+    useEffect(() => {
+        console.log("Active Page: " + activePage);
+    }, [OneNote.run(async context => {
+        const page = context.application.getActivePage();
+        const restApiId = page.getRestApiId();
+        return context.sync().then(function () {
+            setActivePage(restApiId.value)
+            return restApiId.value;
+        });
+    }).catch(function (error) {
+        console.log("Error: " + error);
+        if (error instanceof OfficeExtension.Error) {
+            console.log("Debug info: " + JSON.stringify(error.debugInfo));
+        }
+    })]);
+
+    if (tagState && !tagsSaved) {
         if (tagState.assetTags) {
             loadedAssetTags = tagState.assetTags
         }
@@ -151,36 +192,45 @@ const Tags = props => {
         else {
             loadedStaticTags = props.tags && props.tags[2];
         }
+        // if (tagState.selectedAssetTags) {
+        //     tagState.selectedAssetTags.forEach(x => selectedTags.push(x));
+        // }
+        // if (tagState.selectedIssuerTags) {
+        //     tagState.selectedIssuerTags.forEach(x => selectedTags.push(x));
+        // }
+        // if (tagState.selectedStaticTags) {
+        //     tagState.selectedStaticTags.forEach(x => selectedTags.push(x));
+        // }
+        //setSavedTags(selectedTags);
     }
+    else {
+        //selectedTags = savedTags;
+    };
+
     async function clickTags() {
-        debugger;
+        let noteId;
         await OneNote.run(async context => {
-            // var topMargin;
-            // if (type === "earningsUpdate") {
-            //   topMargin = 120;
-            // } else if (type === "managementCall") {
-            //   topMargin = 60;
-            // } else if ((type = "generalNews")) {
-            //   topMargin = 60;
-            // }
-            var page = context.application.getActivePage();
-            var tagString = "";
-            tags.tagdata.forEach(function (entry) {
-                tagString += "<p><B><I>" + entry.name + "</B></I></p>";
+
+            const page = context.application.getActivePage();
+            const restApiId = page.getRestApiId();
+            return context.sync().then(function () {
+                noteId = restApiId.value;
             });
-            var table = "<p></p>";
-            page.addOutline(520, 0, tagString);
         }).catch(function (error) {
             console.log("Error: " + error);
             if (error instanceof OfficeExtension.Error) {
                 console.log("Debug info: " + JSON.stringify(error.debugInfo));
             }
         });
+        noteId = noteId.replace(/[{}]/g, "");
+        selectedTags && selectedTags.forEach(x => x.NoteId = noteId);
+        const savedNoteTags = await userService.saveTags(selectedTags);
+        dispatch(userActions.storeSavedTags(savedNoteTags));
+        setSavedTags(JSON.parse(savedNoteTags));
+        setTagsSaved(true);
     }
 
-    function handleSubtypeChange() {
-        setSubType(event.target.value);
-    }
+
 
     function a11yProps(index) {
         return {
@@ -196,8 +246,14 @@ const Tags = props => {
         };
     }
 
-    const handleDelete = (event) => {
-        alert('delete');
+    const handleDelete = tag => {
+        for (let index = 0; index < selectedTags.length; index++) {
+            const element = selectedTags[index];
+            if (element == tag.tag) {
+                selectedTags.splice(index, 1);
+            }
+        };
+        dispatch(userActions.storeSavedTags(selectedTags));
     }
 
     const handleSubTabChange = (event, newValue) => {
@@ -207,7 +263,7 @@ const Tags = props => {
 
     return (
         <React.Fragment>
-            <Paper className={classes.searchTagsPaper} elevation={5}>
+            <Paper className={classes.searchTagsPaper} elevation={3}>
                 <Tabs
                     //orientation="vertical"
                     variant="fullWidth"
@@ -238,13 +294,30 @@ const Tags = props => {
                     </SubTabPanel>
                 </SwipeableViews>
             </Paper>
-            <Paper className={classes.selectedTagsPaper} elevation={5}>
+            <Paper className={classes.selectedTagsPaper} elevation={3}>
                 <Typography variant="caption">Selected Tags: </Typography>
                 <div className={classes.displayTags}>
                     {
-                        tagState.savedTags && tagState.savedTags.map((tag) =>
-                            <Chip size="small" label={tag.UniqueIdentifier + '-' + tag.TagName} onDelete={handleDelete} color="primary" variant="outlined" />
-                        )
+                        // Object.keys(myObject).map(function (key, index) {
+                        //     myObject[key] *= 2;
+                        // });
+                        groupedTags && Object.keys(groupedTags).map(function (key, index) {
+                            <Box borderColor="primary.main" className={classes.chipBox} {...chipBox}>
+                                <Typography variant="caption">{key}</Typography>
+                                {
+                                    // groupedTags[key].map((tag) =>
+
+                                    //     <Chip size="small"
+                                    //         className={classes.chips}
+                                    //         name={tag}
+                                    //         label={tag.Attribute + '-' + tag.TagName}
+                                    //         onDelete={handleDelete.bind(this, { tag })}
+                                    //         //color="primary"
+                                    //         variant="outlined" />
+                                    // )
+                                }
+                            </Box>
+                        })
                     }
                 </div>
             </Paper>

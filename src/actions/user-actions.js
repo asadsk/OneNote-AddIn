@@ -4,29 +4,60 @@ import { alertActions } from "./";
 import { history } from "../helpers";
 
 export const userActions = {
-    saveAssetTags,
-    saveIssuerTags,
-    saveStaticTags,
-    addNewTag,
-    deleteTag
+    loadAssetTags,
+    loadIssuerTags,
+    loadStaticTags,
+    addAssetTags,
+    addIssuerTags,
+    addStaticTags,
+    deleteTag,
+    loadAllNoteTemplates,
+    saveTemplateFields,
+    storeSavedTags,
+    setActivePageNoteId
+
 };
-function saveAssetTags(assetTags) {
-    return ({ type: constants.SAVE_ASSET_TAGS, assetTags })
+function loadAssetTags(assetTags) {
+    return ({ type: constants.LOAD_ASSET_TAGS, assetTags })
 }
 
-function saveIssuerTags(issuerTags) {
-    return ({ type: constants.SAVE_ISSUER_TAGS, issuerTags })
+function loadIssuerTags(issuerTags) {
+    return ({ type: constants.LOAD_ISSUER_TAGS, issuerTags })
 }
 
-function saveStaticTags(staticTags) {
-    return ({ type: constants.SAVE_STATIC_TAGS, staticTags })
+function loadStaticTags(staticTags) {
+    return ({ type: constants.LOAD_STATIC_TAGS, staticTags })
 }
 
-function addNewTag(savedTags) {
-    return ({ type: constants.ADD_NEW_TAG, savedTags })
+function addAssetTags(selectedAssetTags) {
+    return ({ type: constants.ADD_ASSET_TAGS, selectedAssetTags })
+}
+
+function addIssuerTags(selectedIssuerTags) {
+    return ({ type: constants.ADD_ISSUER_TAGS, selectedIssuerTags })
+}
+
+function addStaticTags(selectedStaticTags) {
+    return ({ type: constants.ADD_STATIC_TAGS, selectedStaticTags })
 }
 
 function deleteTag(tagToBeDeleted) {
     return ({ type: constants.DELETE_TAG, tagToBeDeleted })
+}
+
+function loadAllNoteTemplates(noteTemplates) {
+    return ({ type: constants.LOAD_ALL_TEMPLATES, noteTemplates })
+}
+
+function saveTemplateFields(templateFields) {
+    return ({ type: constants.SAVE_TEMPLATE_FIELDS, templateFields })
+}
+
+function storeSavedTags(savedTags) {
+    return ({ type: constants.STORE_SAVED_TAGS, savedTags })
+}
+
+function setActivePageNoteId(noteId) {
+    return ({ type: constants.SET_ACTIVE_PAGE_NOTE_ID, noteId })
 }
 

@@ -11,26 +11,29 @@ import { userActions } from '../../actions';
 import { Typography } from "@material-ui/core";
 const useStyles = makeStyles(theme => ({
   root: {
-    width: 230,
-    marginLeft: 16,
+    //width: 230,
+    //marginLeft: 16,
     marginTop: 8,
+    fontSize: 12,
     "& > * + *": {
       marginTop: theme.spacing(1)
     },
     groupLabel: {
-      fontSize: 30
-    }
-  },
-  autocomplete: {
-    groupLabel: {
-      fontSize: 30
+      fontSize: 30,
+      minHeight: 20
     }
   },
   typography: {
     subtitle1: {
       fontSize: 12,
     }
-  }
+  },
+  option: {
+    fontSize: 12,
+    minHeight: 20,
+    '& > span': {
+    },
+  },
 }));
 
 export const AutocompleteComponent = props => {
@@ -42,7 +45,6 @@ export const AutocompleteComponent = props => {
   let loadedAssetTags;
   let loadedIssuerTags;
   let loadedStaticTags;
-  debugger;
   if (tagState) {
     if (tagState.assetTags) {
       loadedAssetTags = tagState.assetTags
@@ -55,24 +57,39 @@ export const AutocompleteComponent = props => {
     }
   }
   const theme = useTheme();
-  debugger;
   props.tags.tagdata = tags;
   //setTagData(props.tagData);
   //let tagData = props.tagData;
   const subTab = props.subTab
+  //if (!subtab) { subtab == "Static" }
   let autocomplete;
+
+  Array.prototype.unique = function () {
+    var a = this.concat();
+    for (var i = 0; i < a.length; ++i) {
+      for (var j = i + 1; j < a.length; ++j) {
+        if (a[i] === a[j])
+          a.splice(j--, 1);
+      }
+    }
+
+    return a;
+  };
 
   if (subTab) {
     if (subTab == constants.ASSET_TAB) {
       autocomplete = <Autocomplete
-        className={classes.autocomplte}
         multiple
         id="autocomplete-tags"
         size="small"
         options={loadedAssetTags}
+        classes={{
+          option: classes.option,
+        }}
         onChange={(event, newValue) => {
           setTags(newValue);
-          dispatch(userActions.addNewTag(newValue));
+          const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+          dispatch(userActions.storeSavedTags(selectedTags));
         }}
         getOptionLabel={option => option.TagName}
         groupBy={option => option.UniqueIdentifier}
@@ -80,16 +97,18 @@ export const AutocompleteComponent = props => {
       />
     }
     else if (subTab == constants.ISSUER_TAB) {
-      debugger;
       autocomplete = <Autocomplete
-        className={classes.autocomplte}
         multiple
         id="autocomplete-tags"
         size="small"
         options={loadedIssuerTags}
+        classes={{
+          option: classes.option,
+        }}
         onChange={(event, newValue) => {
           setTags(newValue);
-          dispatch(userActions.addNewTag(newValue));
+          const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+          dispatch(userActions.storeSavedTags(selectedTags));
         }}
         getOptionLabel={option => option.TagName}
         groupBy={option => option.UniqueIdentifier}
@@ -98,18 +117,21 @@ export const AutocompleteComponent = props => {
     }
     else {
       autocomplete = <Autocomplete
-        className={classes.autocomplte}
         multiple
         id="autocomplete-tags"
         size="small"
         options={loadedStaticTags}
+        classes={{
+          option: classes.option,
+        }}
         onChange={(event, newValue) => {
           setTags(newValue);
-          dispatch(userActions.addNewTag(newValue));
+          const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+          dispatch(userActions.storeSavedTags(selectedTags));
         }}
         getOptionLabel={option => option.TagName}
-        groupBy={option => option.UniqueIdentifier}
-        renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
+        groupBy={option => option.Reference}
+        renderInput={params => <Typography variant="body2"><TextField {...params} variant="outlined" label="Search Tags.." /></ Typography>}
       />
     }
   }

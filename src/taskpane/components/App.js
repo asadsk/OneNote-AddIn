@@ -71,8 +71,6 @@ const useStyles = makeStyles(theme => ({
     flexWrap: "wrap",
     alignContent: "center",
     alignItems: "center"
-    //overflow: "auto",
-    //flexDirection: "column"
   },
   searchTagsPaper: {
     display: "flex",
@@ -113,24 +111,25 @@ const useStyles = makeStyles(theme => ({
   },
   chips: {
     height: 20
+  },
+  tabPanel: {
+    width: 281
   }
 }));
 const App = props => {
   const [value, setValue] = useState(0);
   const [subTabValue, setSubTabValue] = useState(0);
   const [subTabText, setSubTabText] = useState();
+  const [activePage, setActivePage] = useState();
   const [tags, setTags] = useState();
-
   const classes = useStyles();
   const dispatch = useDispatch();
   const tagState = useSelector(state => state.tags);
 
   const theme = useTheme();
-  debugger;
   let loadedAssetTags;
   let loadedIssuerTags;
   let loadedStaticTags;
-  debugger;
   if (tagState) {
     if (tagState.assetTags) {
       loadedAssetTags = tagState.assetTags
@@ -142,37 +141,27 @@ const App = props => {
       loadedStaticTags = tagState.staticTags
     }
   }
+
+  // useEffect(() => {
+  //   OneNote.run(async context => {
+  //     const page = context.application.getActivePage();
+  //     const restApiId = page.getRestApiId();
+  //     return context.sync().then(function () {
+  //       debugger;
+  //       setActivePage(restApiId.value);
+  //     });
+  //   }).catch(function (error) {
+  //     console.log("Error: " + error);
+  //     if (error instanceof OfficeExtension.Error) {
+  //       console.log("Debug info: " + JSON.stringify(error.debugInfo));
+  //     }
+  //   })
+  // }, []);
   // if (!props.isOfficeInitialized) {
   //   return (
   //     <Progress title={title} logo="assets/logo-filled.png" message="Please sideload your addin to see app body." />
   //   );
   // }
-
-  async function clickTags() {
-    debugger;
-    await OneNote.run(async context => {
-      // var topMargin;
-      // if (type === "earningsUpdate") {
-      //   topMargin = 120;
-      // } else if (type === "managementCall") {
-      //   topMargin = 60;
-      // } else if ((type = "generalNews")) {
-      //   topMargin = 60;
-      // }
-      var page = context.application.getActivePage();
-      var tagString = "";
-      tags.tagdata.forEach(function (entry) {
-        tagString += "<p><B><I>" + entry.name + "</B></I></p>";
-      });
-      var table = "<p></p>";
-      page.addOutline(520, 0, tagString);
-    }).catch(function (error) {
-      console.log("Error: " + error);
-      if (error instanceof OfficeExtension.Error) {
-        console.log("Debug info: " + JSON.stringify(error.debugInfo));
-      }
-    });
-  }
 
   function handleSubtypeChange() {
     setSubType(event.target.value);
@@ -192,18 +181,37 @@ const App = props => {
     };
   }
 
+
+
   async function handleTabChange(event, newValue) {
     setValue(newValue);
     if (!loadedAssetTags || !loadedIssuerTags || !loadedStaticTags) {
       Promise.all([userService.getAllAssetTags(), userService.getAllIssuerTags(), userService.getAllStaticTags()])
         .then((responses) => {
-          console.log("These are the promise all response" + responses);
+          //console.log("These are the promise all response" + responses);
           setTags(responses);
-          dispatch(userActions.saveAssetTags(responses[0]));
-          dispatch(userActions.saveIssuerTags(responses[1]));
-          dispatch(userActions.saveStaticTags(responses[2]));
+          dispatch(userActions.loadAssetTags(responses[0]));
+          dispatch(userActions.loadIssuerTags(responses[1]));
+          dispatch(userActions.loadStaticTags(responses[2]));
         });
-    }
+    };
+    await OneNote.run(async context => {
+      const page = context.application.getActivePage();
+      const restApiId = page.getRestApiId();
+      return context.sync().then(async function () {
+        setActivePage(restApiId.value);
+        if (!tagState.savedTags) {
+          const savedTags = await userService.getAllSavedTags(restApiId.value);
+          dispatch(userActions.storeSavedTags(JSON.parse(savedTags)));
+        }
+
+      });
+    }).catch(function (error) {
+      console.log("Error: " + error);
+      if (error instanceof OfficeExtension.Error) {
+        console.log("Debug info: " + JSON.stringify(error.debugInfo));
+      }
+    });
   };
 
   const handleDelete = (event) => {
@@ -229,11 +237,11 @@ const App = props => {
                   <Tab label="Tags" {...a11yProps(1)} />
                 </Tabs>
               </AppBar>
-              <TabPanel value={value} index={0}>
+              <TabPanel className={classes.tabPanel} value={value} index={0}>
                 <Template />
               </TabPanel>
               <Divider />
-              <TabPanel value={value} index={1}>
+              <TabPanel className={classes.tabPanel} value={value} index={1}>
                 <Tags tags={tags} />
               </TabPanel>
             </React.Fragment>
