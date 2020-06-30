@@ -7,7 +7,7 @@ import ListSubheader from "@material-ui/core/ListSubheader";
 import { useState, useEffect } from "react";
 import { constants } from "../../constants";
 import { useSelector, useDispatch } from "react-redux";
-import { userActions } from '../../actions';
+import { userActions } from "../../actions";
 import { Typography } from "@material-ui/core";
 const useStyles = makeStyles(theme => ({
   root: {
@@ -25,19 +25,19 @@ const useStyles = makeStyles(theme => ({
   },
   typography: {
     subtitle1: {
-      fontSize: 12,
+      fontSize: 12
     }
   },
   option: {
     fontSize: 12,
     minHeight: 20,
-    '& > span': {
-    },
-  },
+    "& > span": {}
+  }
 }));
 
 export const AutocompleteComponent = props => {
   const [tags, setTags] = useState();
+  const [staticTags, setStaticTags] = useState();
   //const [tagData, setTagData] = useState();
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -46,30 +46,25 @@ export const AutocompleteComponent = props => {
   let loadedIssuerTags;
   let loadedStaticTags;
   if (tagState) {
-    if (tagState.assetTags) {
-      loadedAssetTags = tagState.assetTags
-    }
-    if (tagState.issuerTags) {
-      loadedIssuerTags = tagState.issuerTags
-    }
-    if (tagState.staticTags) {
-      loadedStaticTags = tagState.staticTags
-    }
+    loadedAssetTags = tagState.assetTags && tagState.assetTags;
+
+    loadedIssuerTags = tagState.issuerTags && tagState.issuerTags;
+
+    loadedStaticTags = tagState.staticTags && tagState.staticTags;
   }
   const theme = useTheme();
   props.tags.tagdata = tags;
   //setTagData(props.tagData);
   //let tagData = props.tagData;
-  const subTab = props.subTab
+  const subTab = props.subTab;
   //if (!subtab) { subtab == "Static" }
   let autocomplete;
 
-  Array.prototype.unique = function () {
+  Array.prototype.unique = function() {
     var a = this.concat();
     for (var i = 0; i < a.length; ++i) {
       for (var j = i + 1; j < a.length; ++j) {
-        if (a[i] === a[j])
-          a.splice(j--, 1);
+        if (a[i] === a[j]) a.splice(j--, 1);
       }
     }
 
@@ -78,64 +73,68 @@ export const AutocompleteComponent = props => {
 
   if (subTab) {
     if (subTab == constants.ASSET_TAB) {
-      autocomplete = <Autocomplete
-        multiple
-        id="autocomplete-tags"
-        size="small"
-        options={loadedAssetTags}
-        classes={{
-          option: classes.option,
-        }}
-        onChange={(event, newValue) => {
-          setTags(newValue);
-          const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
-          dispatch(userActions.storeSavedTags(selectedTags));
-        }}
-        getOptionLabel={option => option.TagName}
-        groupBy={option => option.UniqueIdentifier}
-        renderInput={params => <Typography variant="caption"><TextField {...params} variant="outlined" label="Search Tags.." /></Typography>}
-      />
-    }
-    else if (subTab == constants.ISSUER_TAB) {
-      autocomplete = <Autocomplete
-        multiple
-        id="autocomplete-tags"
-        size="small"
-        options={loadedIssuerTags}
-        classes={{
-          option: classes.option,
-        }}
-        onChange={(event, newValue) => {
-          setTags(newValue);
-          const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
-          dispatch(userActions.storeSavedTags(selectedTags));
-        }}
-        getOptionLabel={option => option.TagName}
-        groupBy={option => option.UniqueIdentifier}
-        renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
-      />
-    }
-    else {
-      autocomplete = <Autocomplete
-        multiple
-        id="autocomplete-tags"
-        size="small"
-        options={loadedStaticTags}
-        classes={{
-          option: classes.option,
-        }}
-        onChange={(event, newValue) => {
-          setTags(newValue);
-          const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
-          dispatch(userActions.storeSavedTags(selectedTags));
-        }}
-        getOptionLabel={option => option.TagName}
-        groupBy={option => option.Reference}
-        renderInput={params => <Typography variant="body2"><TextField {...params} variant="outlined" label="Search Tags.." /></ Typography>}
-      />
+      autocomplete = (
+        <Autocomplete
+          multiple
+          id="autocomplete-asset-tags"
+          size="small"
+          options={loadedAssetTags}
+          classes={{
+            option: classes.option
+          }}
+          onChange={(event, newValue) => {
+            setTags(newValue);
+            const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+            dispatch(userActions.storeSavedTags(selectedTags));
+          }}
+          getOptionLabel={option => option.TagName}
+          groupBy={option => option.UniqueIdentifier}
+          renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
+        />
+      );
+    } else if (subTab == constants.ISSUER_TAB) {
+      autocomplete = (
+        <Autocomplete
+          multiple
+          id="autocomplete-issuer-tags"
+          size="small"
+          options={loadedIssuerTags}
+          classes={{
+            option: classes.option
+          }}
+          onChange={(event, newValue) => {
+            setTags(newValue);
+            const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+            dispatch(userActions.storeSavedTags(selectedTags));
+          }}
+          getOptionLabel={option => option.TagName}
+          groupBy={option => option.UniqueIdentifier}
+          renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
+        />
+      );
+    } else {
+      autocomplete = (
+        <Autocomplete
+          multiple
+          id="autocomplete-static-tags"
+          size="small"
+          options={loadedStaticTags}
+          classes={{
+            option: classes.option
+          }}
+          onChange={(event, newValue) => {
+            setTags(newValue);
+            // Try and not put the static reference in tag name
+            const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+            dispatch(userActions.storeSavedTags(selectedTags));
+          }}
+          getOptionLabel={option => option.TagName}
+          groupBy={option => option.UniqueIdentifier}
+          renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
+        />
+      );
     }
   }
-
   const renderGroup = params => [
     <ListSubheader key={params.key} component="div">
       {params.key}
@@ -145,14 +144,9 @@ export const AutocompleteComponent = props => {
 
   return (
     <React.Fragment>
-      <div className={classes.root}>
-        {autocomplete}
-      </div>
-
-    </React.Fragment >
+      <div className={classes.root}>{autocomplete}</div>
+    </React.Fragment>
   );
 };
-
-
 
 export default AutocompleteComponent;

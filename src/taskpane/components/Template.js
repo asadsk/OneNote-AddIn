@@ -15,7 +15,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { userActions } from '../../actions';
 import { userService } from "../../services";
 import { Typography } from "@material-ui/core";
-import { te } from "date-fns/locale";
+import Alert from '@material-ui/lab/Alert';
+import Snackbar from '@material-ui/core/Snackbar'
 
 const useStyles = makeStyles(theme => ({
     textfield: {
@@ -30,9 +31,9 @@ const useStyles = makeStyles(theme => ({
         marginBottom: 0
     },
     button: {
-        marginLeft: 88,
-        marginRight: 88,
-        marginTop: 8
+        marginLeft: 50,
+        marginRight: 50,
+        marginTop: 16
     },
     templateContainer: {
         margin: theme.spacing(1)
@@ -44,35 +45,35 @@ const useStyles = makeStyles(theme => ({
     templateTypes: {
         height: 10,
         minHeight: 35
+    },
+    alert: {
+        width: '100%',
     }
 }));
 const Template = props => {
     const classes = useStyles();
     const [type, setType] = useState();
-    const [noteType, setNoteType] = useState();
     const [templates, setTemplates] = useState();
     const [templateFields, setTemplateFields] = useState();
     const [templateText, setTemplateText] = useState();
-    const [previousTemplate, setPreviousTemplate] = useState();
-    const [contentObj, setContentObj] = useState({
-        financialDate: {
-            date: "",
-            period: ""
-        },
-        companyName: "",
-        mandatoryOutlines: {
-            riskCommentary: true,
-            marketCommentary: true
-        }
-    });
+    const [alertState, setAlertState] = useState(false);
+
+    const [disabled, setDisabled] = useState(true);
     const dispatch = useDispatch();
     const tagState = useSelector(state => state.tags);
-    // useEffect(() => {
-    //     debugger;
-    //     const noteTemplates = tagState && tagState.noteTemplates;
-    //     setTemplates(noteTemplates);
-    // });
+
+    function handleClose(event, reason) {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setAlertState(false);
+    }
+
     async function handleChange(event) {
+        if (event.target.value) {
+            setDisabled(false);
+        }
         const templateFields = await userService.getTemplateFields(event.target.value);
         setTemplateFields(templateFields);
         let templateTextFields = {};
@@ -104,16 +105,6 @@ const Template = props => {
             }
         }
         setTemplateText(templateText);
-        // if (previousTemplate) {
-        //     setTemplateText(templateText => ({ ...templateText, templateInfo: previousTemplate.concat(text) }));
-        //     setPreviousTemplate(templateInfo.previousTemplate);
-        // }
-        // else {
-        //     setTemplateText(templateText => ({ ...templateText, templateInfo: text }));
-        //     setPreviousTemplate(templateInfo.previousTemplate);
-        // }
-        // console.log(templateText);
-        //setContentObj(contentObj => ({ ...contentObj, companyName: event.target.value }));
     };
 
     return (
@@ -129,206 +120,86 @@ const Template = props => {
                         </MenuItem>
                     )
                     }
-                    {/* <MenuItem value="earningsUpdate">Earnings Update</MenuItem>
-                    <MenuItem value="generalNews">General News</MenuItem>
-                    <MenuItem value="managementCall">Management Call</MenuItem> */}
                 </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
                 {
                     templateFields && templateFields.map(field =>
-                        <TextField
-                            onChange={handleTextChange}
-                            className={classes.textfield}
-                            size="small"
-                            required
-                            id={field}
-                            label={"Enter " + field}
-                        />
+                        <React.Fragment>
+                            <TextField
+                                onChange={handleTextChange}
+                                className={classes.textfield}
+                                size="small"
+                                required
+                                id={field}
+                                label={"Enter " + field}
+                            />
+                        </React.Fragment>
                     )
                 }
-            </FormControl>
-            <Button
-                type="submit"
-                variant="outlined"
-                color="primary"
-                className={classes.button}
-                endIcon={<AddIcon />}
-                onClick={click}
-            >
-                ADD
+                <Snackbar open={alertState} autoHideDuration={6000} onClose={handleClose}>
+                    <Alert className={classes.alert} onClose={handleClose} severity="error">
+                        Please fill all the required fields
+                    </Alert>
+                </Snackbar>
+
+                <Button
+                    disabled={disabled}
+                    type="submit"
+                    variant="outlined"
+                    color="primary"
+                    className={classes.button}
+                    //endIcon={<AddIcon />}
+                    onClick={click}
+                >
+                    ADD TO NOTE
         </Button>
+            </FormControl>
         </div>
     )
 
 
     async function click() {
         await OneNote.run(async context => {
+            const textFieldEntries = Object.entries(templateText);
+            if (Object.keys(templateText).length > 0) {
+                const values = Object.values(templateText);
+                for (let index = 0; index < values.length; index++) {
+                    const element = values[index];
+                    if (element == "") {
+                        setAlertState(true);
+                        return;
+                    }
+                }
+            }
+            if (textFieldEntries) {
+                console.log(textFieldEntries);
+            }
             // Queue a command to add a page to the current section.
-            var section = context.application.getActiveSection();
             var page = context.application.getActivePage();
-            // var pageContents = context.application.getActivePageOrNull().contents;
-            // var pageContent = pageContents.getItem(0);
-            // if (pageContent.outline) {
-            //   var paragraphs = pageContent.outline.paragraphs;
-            // }
-            //var firstParagraph = paragraphs.items[0];
-            // templateText.templateInfo.forEach(x => )
-            // var date = contentObj.financialDate.date;
-            // var period = "Q" + contentObj.financialDate.period;
-            // if (!date) {
-            //     var today = new Date();
-            //     var day = today.getDate();
-            //     var month = today.getMonth() + 1;
-            //     var year = today.getFullYear();
-            //     date = month + "/" + day + "/" + year;
-            //     period = "Q" + Math.floor((today.getMonth() + 3) / 3);
-            // }
-
-            // var companyName = contentObj.companyName;
-            // var riskCommentary = contentObj.mandatoryOutlines.riskCommentary;
-            // var marketCommentary = contentObj.mandatoryOutlines.marketCommentary;
-            // var items = [
-            //   ["Financial Date:", date],
-            //   ["Period:", period]
-            // ];
-            // firstParagraph.insertTableAsSibling("Before", 2, 2, items);
-
-            //console.log(tags);
             page.addOutline(40, 70, "<p></p>");
             return context.sync().then(function () {
                 var pageContents = page.contents;
 
                 // Queue a command to load the pageContents to access its data.
                 context.load(pageContents);
-                // return context.sync().then(function() {
-                //   if (pageContents.items.length != 0) {
-                //     pageContents.items[0].delete();
-                //   }
-                //   context.load(pageContents);
-                //   return context.sync().then(function() {
-                //     if (pageContents.items.length == 0) {
-                //       page.addOutline(40, 70, "<p></p>");
-                //     }
-                //     var newContent = page.contents;
-                //     context.load(newContent);
                 return context.sync().then(function () {
                     if (pageContents.items.length != 0 && pageContents.items[0].type == "Outline") {
                         // First item is an outline.
                         var outline = pageContents.items[0].outline;
-
-                        // Queue a command to append a paragraph to the outline.
-                        //outline.appendHtml("<p>new paragraph</p>");
-                        const entries = Object.entries(templateText);
-                        for (const values in entries) {
+                        Object.entries(templateText).map(field => {
                             outline.appendHtml(
                                 "<table border='border-collapse'> \
-            <tr> \
-              <td style='border: 1px solid black;'><B><I> ##"+ values[0] + ": </I></B></td> \
-              <td style='border: 1px solid black;'>" +
-                                values[1] +
-                                "</td> \
-            </tr> \
-            </table>"
+                                    <tr> \
+                                      <td style='border: 1px solid black;'><B><I> ##"+ field[0] + ": </I></B></td> \
+                                      <td style='border: 1px solid black;'>" + field[1] + "</td> \
+                                    </tr> \
+                                </table>"
                             );
-                        }
-                        //                 if (type === "earningsUpdate") {
-                        //                     outline.appendHtml(
-                        //                         "<table border='border-collapse'> \
-                        //     <tr> \
-                        //       <td style='border: 1px solid black;'><B><I>##Financial Date: </I></B></td> \
-                        //       <td style='border: 1px solid black;'>" +
-                        //                         date +
-                        //                         "</td> \
-                        //     </tr> \
-                        //     <tr> \
-                        //       <td style='border: 1px solid black;'><B><I>##Period: </I></B></td> \
-                        //       <td style='border: 1px solid black;'>" +
-                        //                         period +
-                        //                         "</td> \
-                        //     </tr> \
-                        //     <tr> \
-                        //       <td style='border: 1px solid black;'><B><I>##Company: </I></B></td> \
-                        //       <td style='border: 1px solid black;'>" +
-                        //                         companyName +
-                        //                         "</td> \
-                        //     </tr> \
-                        //   </table>"
-                        //                     );
-                        //                     if (riskCommentary && marketCommentary) {
-                        //                         page.addOutline(
-                        //                             40,
-                        //                             160,
-                        //                             "<table border='border-collapse'> \
-                        //       <tr> \
-                        //           <td style='border: 1px solid black;'><B><I>##Risk Commentary: </I></B></td> \
-                        //           <td style='border: 1px solid black;'></td> \
-                        //         </tr> \
-                        //         </table>"
-                        //                         );
-                        //                         page.addOutline(
-                        //                             40,
-                        //                             220,
-                        //                             "<table border='border-collapse'> \
-                        //         <tr> \
-                        //         <td style='border: 1px solid black;'><B><I>##Market Commentary: </I></B></td> \
-                        //         <td style='border: 1px solid black;'></td> \
-                        //       </tr> \
-                        //       </table>"
-                        //                         );
-                        //                     }
-                        //                     if (riskCommentary && !marketCommentary) {
-                        //                         page.addOutline(
-                        //                             40,
-                        //                             160,
-                        //                             "<table border='border-collapse'> \
-                        //       <tr> \
-                        //           <td style='border: 1px solid black;'><B><I>##Risk Commentary: </I></B></td> \
-                        //           <td style='border: 1px solid black;'></td> \
-                        //         </tr> \
-                        //       </table>"
-                        //                         );
-                        //                     }
-                        //                     if (!riskCommentary && marketCommentary) {
-                        //                         page.addOutline(
-                        //                             40,
-                        //                             160,
-                        //                             "<table border='border-collapse'> \
-                        //       <tr> \
-                        //           <td style='border: 1px solid black;'><B><I>##Market Commentary: </I></B></td> \
-                        //           <td style='border: 1px solid black;'></td> \
-                        //         </tr> \
-                        //       </table>"
-                        //                         );
-                        //                     }
-                        //                 } else if (type === "managementCall") {
-                        //                     outline.appendHtml(
-                        //                         "<table border='border-collapse'> \
-                        //     <tr> \
-                        //         <td style='border: 1px solid black;'><B><I>##Company: </I></B></td> \
-                        //         <td style='border: 1px solid black;'>" +
-                        //                         companyName +
-                        //                         "</td> \
-                        //       </tr> \
-                        //     </table>"
-                        //                     );
-                        //                 } else if(){
-                        //                     outline.appendHtml(
-                        //                         "<table border='border-collapse'> \
-                        //     <tr> \
-                        //         <td style='border: 1px solid black;'><B><I>##Company: </I></B></td> \
-                        //         <td style='border: 1px solid black;'>" +
-                        //                         companyName +
-                        //                         "</td> \
-                        //       </tr> \
-                        //     </table>"
-                        //                     );
-                        //                 }
+                        });
 
                         return context.sync();
                     }
-                    //   });
-                    // });
                 });
             });
         }).catch(function (error) {
