@@ -38,7 +38,8 @@ const useStyles = makeStyles(theme => ({
 export const AutocompleteComponent = props => {
   const [tags, setTags] = useState();
   const [staticTags, setStaticTags] = useState();
-  //const [tagData, setTagData] = useState();
+  const [assetTags, setAssetTags] = useState();
+  const [issuerTags, setIssuerTags] = useState();
   const classes = useStyles();
   const dispatch = useDispatch();
   const tagState = useSelector(state => state.tags);
@@ -51,6 +52,8 @@ export const AutocompleteComponent = props => {
     loadedIssuerTags = tagState.issuerTags && tagState.issuerTags;
 
     loadedStaticTags = tagState.staticTags && tagState.staticTags;
+    // const temp = loadedStaticTags && [...loadedStaticTags].splice(1, 100);
+    // setStaticTags(temp);
   }
   const theme = useTheme();
   props.tags.tagdata = tags;
@@ -78,14 +81,24 @@ export const AutocompleteComponent = props => {
           multiple
           id="autocomplete-asset-tags"
           size="small"
-          options={loadedAssetTags}
+          renderTags={() => null}
+          options={assetTags ? assetTags : [...loadedAssetTags].splice(1, 100)}
           classes={{
             option: classes.option
+          }}
+          onInputChange={(event, value) => {
+            if (value.length > 2) {
+              const tags =
+                loadedAssetTags &&
+                loadedAssetTags.filter(tag => tag.TagName.toLowerCase().includes(value.toLowerCase()));
+              setAssetTags(tags);
+            }
           }}
           onChange={(event, newValue) => {
             setTags(newValue);
             const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
             dispatch(userActions.storeSavedTags(selectedTags));
+            setAssetTags(null);
           }}
           getOptionLabel={option => option.TagName}
           groupBy={option => option.UniqueIdentifier}
@@ -98,14 +111,24 @@ export const AutocompleteComponent = props => {
           multiple
           id="autocomplete-issuer-tags"
           size="small"
-          options={loadedIssuerTags}
+          renderTags={() => null}
+          options={issuerTags ? issuerTags : [...loadedIssuerTags].splice(1, 100)}
           classes={{
             option: classes.option
+          }}
+          onInputChange={(event, value) => {
+            if (value.length > 2) {
+              const tags =
+                loadedIssuerTags &&
+                loadedIssuerTags.filter(tag => tag.TagName.toLowerCase().includes(value.toLowerCase()));
+              setIssuerTags(tags);
+            }
           }}
           onChange={(event, newValue) => {
             setTags(newValue);
             const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
             dispatch(userActions.storeSavedTags(selectedTags));
+            setIssuerTags(null);
           }}
           getOptionLabel={option => option.TagName}
           groupBy={option => option.UniqueIdentifier}
@@ -113,20 +136,30 @@ export const AutocompleteComponent = props => {
         />
       );
     } else {
-      autocomplete = (
+      autocomplete = loadedStaticTags && (
         <Autocomplete
           multiple
           id="autocomplete-static-tags"
           size="small"
-          options={loadedStaticTags}
+          renderTags={() => null}
+          options={staticTags ? staticTags : loadedStaticTags}
           classes={{
             option: classes.option
+          }}
+          onInputChange={(event, value) => {
+            if (value.length > 2) {
+              const tags =
+                loadedStaticTags &&
+                loadedStaticTags.filter(tag => tag.TagName.toLowerCase().includes(value.toLowerCase()));
+              setStaticTags(tags);
+            }
           }}
           onChange={(event, newValue) => {
             setTags(newValue);
             // Try and not put the static reference in tag name
             const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
             dispatch(userActions.storeSavedTags(selectedTags));
+            setStaticTags(null);
           }}
           getOptionLabel={option => option.TagName}
           groupBy={option => option.UniqueIdentifier}

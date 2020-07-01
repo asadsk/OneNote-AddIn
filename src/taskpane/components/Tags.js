@@ -104,7 +104,9 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 2
   },
   displayTags: {
-    padding: "inherit"
+    padding: "inherit",
+    width: "fit-content",
+    minWidth: "-webkit-fill-available"
   },
   chips: {
     height: 20,
@@ -126,8 +128,7 @@ const useStyles = makeStyles(theme => ({
 const Tags = props => {
   const [value, setValue] = useState(0);
   const [subTabValue, setSubTabValue] = useState(0);
-  const [subTabText, setSubTabText] = useState();
-  const [activePage, setActivePage] = useState();
+  const [subTabText, setSubTabText] = useState("Static");
   const [tags, setTags] = useState({
     tagdata: []
   });
