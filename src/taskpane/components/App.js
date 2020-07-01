@@ -1,14 +1,16 @@
 import * as React from "react";
 import "date-fns";
-import Autocomplete from "./Autocomplete"; //Other autocomplete component
-import AutocompleteComponent from "./AutocompleteComponent";
-import Template from "./Template"
+import Template from "./Template";
+import Tags from "./Tags";
+import Typography from "@material-ui/core/Typography";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import TabPanel from "./Tab";
 import SubTabPanel from "./SubTab";
+import Chip from "@material-ui/core/Chip";
 import DateFnsUtils from "@date-io/date-fns";
 import Container from "@material-ui/core/Container";
+import Loader from "./Loader";
 import AddIcon from "@material-ui/icons/Add";
 import { purple } from "@material-ui/core/colors";
 import Grid from "@material-ui/core/Grid";
@@ -16,10 +18,15 @@ import { Tabs, Tab, Divider } from "@material-ui/core";
 import AppBar from "@material-ui/core/AppBar";
 import Paper from "@material-ui/core/Paper";
 import Button from "@material-ui/core/Button";
-import { userService } from "../../services"
-import { makeStyles } from "@material-ui/core/styles";
+import { userService } from "../../services";
+import { useTheme, makeStyles } from "@material-ui/core/styles";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core";
 import { constants } from "../../constants";
+import { Provider } from "react-redux"; //The entire app gets the access to store
+import { store } from "./../../helpers";
+import { useSelector, useDispatch } from "react-redux";
+import { userActions } from "../../actions";
+import { isFirstDayOfMonth } from "date-fns";
 //import Progress from "./Progress";
 /* global Button, Header, HeroList, HeroListItem, Progress */
 
@@ -63,55 +70,132 @@ const useStyles = makeStyles(theme => ({
   },
   paper: {
     display: "flex",
+    flexWrap: "wrap",
+    alignContent: "center",
+    alignItems: "center"
+  },
+  searchTagsPaper: {
+    display: "flex",
     overflow: "auto",
-    flexDirection: "column"
+    flexDirection: "column",
+    marginTop: theme.spacing(1),
+    minHeight: 150
+  },
+  selectedTagsPaper: {
+    display: "flex",
+    overflow: "auto",
+    flexDirection: "column",
+    marginTop: theme.spacing(1),
+    maxHeight: 150,
+    minHeight: 150,
+    padding: 10
   },
   container: {
     alignItems: "center"
   },
   subtabs: {
-    minHeight: 36
+    minHeight: 36,
+    height: "fit-content"
+  },
+
+  tag: {
+    marginTop: 3,
+    height: 10,
+    padding: ".15em 4px",
+    fontWeight: 400,
+    lineHeight: "10px",
+    borderRadius: 2
+  },
+  displayTags: {
+    padding: "inherit",
+    width: "fit-content"
+  },
+  chips: {
+    height: 20
+  },
+  tabPanel: {
+    width: 281
   }
 }));
+
 const App = props => {
   const [value, setValue] = useState(0);
-  const [subTabValue, setsubTabValue] = useState(0);
-  const [tags, setTags] = useState({
-    tagdata: []
+  const [subTabValue, setSubTabValue] = useState();
+  const [subTabText, setSubTabText] = useState();
+  const [initPage, setInitPage] = useState();
+  const [activePage, setActivePage] = useState();
+  const [loaderState, setLoaderState] = useState(false);
+  const [tags, setTags] = useState();
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const tagState = useSelector(state => state.tags);
+
+  const theme = useTheme();
+  let loadedAssetTags;
+  let loadedIssuerTags;
+  let loadedStaticTags;
+  if (tagState) {
+    if (tagState.assetTags) {
+      loadedAssetTags = tagState.assetTags;
+    }
+    if (tagState.issuerTags) {
+      loadedIssuerTags = tagState.issuerTags;
+    }
+    if (tagState.staticTags) {
+      loadedStaticTags = tagState.staticTags;
+    }
+  }
+
+  const initializePage = OneNote.run(async context => {
+    const page = context.application.getActivePage();
+    const restApiId = page.getRestApiId();
+    return context.sync().then(function() {
+      console.log("Init page is :" + restApiId.value);
+      // setInitPage(restApiId.value)
+      localStorage.removeItem("activePage");
+      localStorage.setItem("activePage", restApiId.value);
+    });
+  }).catch(function(error) {
+    console.log("Error: " + error);
+    if (error instanceof OfficeExtension.Error) {
+      console.log("Debug info: " + JSON.stringify(error.debugInfo));
+    }
   });
 
-  const classes = useStyles();
-  // if (!props.isOfficeInitialized) {
-  //   return (
-  //     <Progress title={title} logo="assets/logo-filled.png" message="Please sideload your addin to see app body." />
-  //   );
-  // }
+  let loaderComponent;
 
-  async function clickTags() {
-    debugger;
-    await OneNote.run(async context => {
-      // var topMargin;
-      // if (type === "earningsUpdate") {
-      //   topMargin = 120;
-      // } else if (type === "managementCall") {
-      //   topMargin = 60;
-      // } else if ((type = "generalNews")) {
-      //   topMargin = 60;
-      // }
-      var page = context.application.getActivePage();
-      var tagString = "";
-      tags.tagdata.forEach(function (entry) {
-        tagString += "<p><B><I>" + entry.name + "</B></I></p>";
-      });
-      var table = "<p></p>";
-      page.addOutline(520, 0, tagString);
-    }).catch(function (error) {
-      console.log("Error: " + error);
-      if (error instanceof OfficeExtension.Error) {
-        console.log("Debug info: " + JSON.stringify(error.debugInfo));
-      }
-    });
+  if (loaderState) {
+    loaderComponent = <Loader type="linear" loaderText="Fetching Tags..." />;
   }
+
+  /* Use Effect to update the active page state */
+  useEffect(() => {
+    async function getActivePage() {
+      OneNote.run(async context => {
+        const page = context.application.getActivePage();
+        const restApiId = page.getRestApiId();
+        return context.sync().then(function() {
+          var activePage = localStorage.getItem("activePage");
+          if (activePage && activePage != restApiId.value) {
+            // setActivePage(restApiId.value);
+            setValue(0);
+            console.log("Active Page Updated");
+            localStorage.setItem("activePage", restApiId.value);
+          }
+        });
+      }).catch(function(error) {
+        console.log("Error: " + error);
+        if (error instanceof OfficeExtension.Error) {
+          console.log("Debug info: " + JSON.stringify(error.debugInfo));
+        }
+      });
+    }
+    getActivePage();
+    const interval = setInterval(() => getActivePage(), 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   function handleSubtypeChange() {
     setSubType(event.target.value);
@@ -131,78 +215,82 @@ const App = props => {
     };
   }
 
-  const handleTabChange = (event, newValue) => {
-    debugger;
+  async function handleTabChange(event, newValue) {
+    setLoaderState(true);
     setValue(newValue);
+    if (!loadedAssetTags || !loadedIssuerTags || !loadedStaticTags) {
+      Promise.all([userService.getAllAssetTags(), userService.getAllIssuerTags(), userService.getAllStaticTags()]).then(
+        responses => {
+          //console.log("These are the promise all response" + responses);
+          setTags(responses);
+          const sortedStaticTags = responses[2];
+          sortedStaticTags.sort((a, b) =>
+            a.UniqueIdentifier > b.UniqueIdentifier ? 1 : b.UniqueIdentifier > a.UniqueIdentifier ? -1 : 0
+          );
+          dispatch(userActions.loadAssetTags(responses[0]));
+          dispatch(userActions.loadIssuerTags(responses[1]));
+          dispatch(userActions.loadStaticTags(sortedStaticTags));
+        }
+      );
+    }
+    await OneNote.run(async context => {
+      const page = context.application.getActivePage();
+      const restApiId = page.getRestApiId();
+      return context.sync().then(async function() {
+        setActivePage(restApiId.value);
+        console.log("Current Active page is this :" + restApiId.value);
+        //if (!tagState.savedTags) {
+        const savedTags = await userService.getAllSavedTags(restApiId.value);
+        dispatch(userActions.storeSavedTags(JSON.parse(savedTags)));
+        //}
+        setLoaderState(false);
+      });
+    }).catch(function(error) {
+      console.log("Error: " + error);
+      if (error instanceof OfficeExtension.Error) {
+        console.log("Debug info: " + JSON.stringify(error.debugInfo));
+      }
+    });
+  }
+
+  const handleDelete = event => {
+    alert("delete");
   };
 
   const handleSubTabChange = (event, newValue) => {
-    //alert('I am in');
-    debugger;
-    if (event.target.textContent == constants.ASSET_TAB) {
-      console.log(event.target.textContent)
-    }
-    setsubTabValue(newValue);
+    setSubTabValue(newValue);
+    setSubTabText(event.target.textContent);
   };
 
   return (
+    //<Provider store={store}>
     <MuiThemeProvider theme={themeObject}>
       <div className="ms-welcome">
         <Container className={classes.container}>
-          <Grid item xs={12} sm={6}>
-            <Paper className={classes.paper} elevation={3}>
-              <React.Fragment>
-                <AppBar position="static">
-                  <Tabs variant="fullWidth" value={value} onChange={handleTabChange} aria-label="simple tabs example">
-                    <Tab label="Template" {...a11yProps(0)} />
-                    <Tab label="Tags" {...a11yProps(1)} />
-                  </Tabs>
-                </AppBar>
-                <TabPanel value={value} index={0}>
-                  {Template}
-                </TabPanel>
-                <Divider />
-                <TabPanel value={value} index={1}>
-                  <Tabs
-                    //orientation="vertical"
-                    variant="fullWidth"
-                    value={subTabValue}
-                    onChange={handleSubTabChange}
-                    aria-label="tags subtabs"
-                    indicatorColor="primary"
-                  //className={classes.tagsPanel}
-                  >
-                    <Tab disableRipple className={classes.subtabs} label="Static" {...a11ySubTabProps(0)} />
-                    <Tab disableRipple className={classes.subtabs} label="Issuer" {...a11ySubTabProps(1)} />
-                    <Tab disableRipple className={classes.subtabs} label="Asset" {...a11ySubTabProps(2)} />
-                  </Tabs>
-                  <SubTabPanel value={subTabValue} index={0}>
-                    <AutocompleteComponent tags={tags} />
-                  </SubTabPanel>
-                  <SubTabPanel value={subTabValue} index={1}>
-                    <AutocompleteComponent tags={tags} />
-                  </SubTabPanel>
-                  <SubTabPanel value={subTabValue} index={2}>
-                    <AutocompleteComponent tags={tags} />
-                  </SubTabPanel>
-
-                  <Button
-                    type="submit"
-                    variant="outlined"
-                    color="primary"
-                    className={classes.tagButton}
-                    endIcon={<AddIcon />}
-                    onClick={clickTags}
-                  >
-                    ADD TAGS
-                  </Button>
-                </TabPanel>
-              </React.Fragment>
-            </Paper>
-          </Grid>
+          {/* <Grid item xs={12} sm={6} alignItems="center" justify="center" direction="column"> */}
+          <Paper className={classes.paper} elevation={3}>
+            <React.Fragment>
+              <AppBar position="static">
+                <Tabs variant="fullWidth" value={value} onChange={handleTabChange} aria-label="simple tabs example">
+                  <Tab label="Template" {...a11yProps(0)} />
+                  <Tab label="Tags" {...a11yProps(1)} />
+                </Tabs>
+              </AppBar>
+              <TabPanel className={classes.tabPanel} value={value} index={0}>
+                <Template />
+              </TabPanel>
+              <Divider />
+              <TabPanel className={classes.tabPanel} value={value} index={1}>
+                <div>{loaderComponent}</div>
+                <Tags tags={tags} />
+              </TabPanel>
+            </React.Fragment>
+          </Paper>
+          {/* </Grid> */}
         </Container>
       </div>
     </MuiThemeProvider>
+    //</Provider >
   );
 };
 

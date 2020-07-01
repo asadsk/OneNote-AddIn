@@ -11,8 +11,7 @@ function _get(url, payLoad) {
   const apiUrl = BaseUrl + url;
   const requestOptions = {
     method: "GET",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ payLoad })
+    headers: { "Content-Type": "application/json" }
   };
   return fetch(apiUrl, requestOptions)
     .then(handleResponse)
@@ -22,7 +21,6 @@ function _get(url, payLoad) {
 }
 
 async function _getAll(url) {
-  debugger;
   const apiUrl = BaseUrl + url;
   const requestOptions = {
     method: "GET",
@@ -35,7 +33,6 @@ async function _getAll(url) {
   return fetch(url, requestOptions)
     .then(handleResponse)
     .then(res => {
-      debugger;
       return res;
     });
 }
@@ -52,18 +49,14 @@ function _put(url, payLoad) {
       return res;
     });
 }
-function _post(url, payLoad) {
+async function _post(url, payLoad) {
   const apiUrl = BaseUrl + url;
   const requestOptions = {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*"
-    },
-    mode: "no-cors",
-    body: JSON.stringify({ payLoad })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payLoad)
   };
-  return fetch(url, requestOptions)
+  return fetch(apiUrl, requestOptions)
     .then(handleResponse)
     .then(res => {
       return res;

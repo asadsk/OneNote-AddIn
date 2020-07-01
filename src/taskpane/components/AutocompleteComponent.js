@@ -1,36 +1,173 @@
 import React from "react";
 import Chip from "@material-ui/core/Chip";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import { makeStyles } from "@material-ui/core/styles";
+import { useTheme, makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import { useState, useEffect } from "react";
+import { constants } from "../../constants";
+import { useSelector, useDispatch } from "react-redux";
+import { userActions } from "../../actions";
+import { Typography } from "@material-ui/core";
 const useStyles = makeStyles(theme => ({
   root: {
-    width: 250,
-    marginLeft: 8,
+    //width: 230,
+    //marginLeft: 16,
     marginTop: 8,
+    fontSize: 12,
     "& > * + *": {
       marginTop: theme.spacing(1)
     },
     groupLabel: {
-      fontSize: 30
+      fontSize: 30,
+      minHeight: 20
     }
   },
-  autocomplete: {
-    groupLabel: {
-      fontSize: 30
+  typography: {
+    subtitle1: {
+      fontSize: 12
     }
+  },
+  option: {
+    fontSize: 12,
+    minHeight: 20,
+    "& > span": {}
   }
 }));
 
 export const AutocompleteComponent = props => {
   const [tags, setTags] = useState();
+  const [staticTags, setStaticTags] = useState();
+  const [assetTags, setAssetTags] = useState();
+  const [issuerTags, setIssuerTags] = useState();
   const classes = useStyles();
-  debugger;
-  props.tags.tagdata = tags;
+  const dispatch = useDispatch();
+  const tagState = useSelector(state => state.tags);
+  let loadedAssetTags;
+  let loadedIssuerTags;
+  let loadedStaticTags;
+  if (tagState) {
+    loadedAssetTags = tagState.assetTags && tagState.assetTags;
 
-  console.log(tags);
+    loadedIssuerTags = tagState.issuerTags && tagState.issuerTags;
+
+    loadedStaticTags = tagState.staticTags && tagState.staticTags;
+    // const temp = loadedStaticTags && [...loadedStaticTags].splice(1, 100);
+    // setStaticTags(temp);
+  }
+  const theme = useTheme();
+  props.tags.tagdata = tags;
+  //setTagData(props.tagData);
+  //let tagData = props.tagData;
+  const subTab = props.subTab;
+  //if (!subtab) { subtab == "Static" }
+  let autocomplete;
+
+  Array.prototype.unique = function() {
+    var a = this.concat();
+    for (var i = 0; i < a.length; ++i) {
+      for (var j = i + 1; j < a.length; ++j) {
+        if (a[i] === a[j]) a.splice(j--, 1);
+      }
+    }
+
+    return a;
+  };
+
+  if (subTab) {
+    if (subTab == constants.ASSET_TAB) {
+      autocomplete = (
+        <Autocomplete
+          multiple
+          id="autocomplete-asset-tags"
+          size="small"
+          renderTags={() => null}
+          options={assetTags ? assetTags : [...loadedAssetTags].splice(1, 100)}
+          classes={{
+            option: classes.option
+          }}
+          onInputChange={(event, value) => {
+            if (value.length > 2) {
+              const tags =
+                loadedAssetTags &&
+                loadedAssetTags.filter(tag => tag.TagName.toLowerCase().includes(value.toLowerCase()));
+              setAssetTags(tags);
+            }
+          }}
+          onChange={(event, newValue) => {
+            setTags(newValue);
+            const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+            dispatch(userActions.storeSavedTags(selectedTags));
+            setAssetTags(null);
+          }}
+          getOptionLabel={option => option.TagName}
+          groupBy={option => option.UniqueIdentifier}
+          renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
+        />
+      );
+    } else if (subTab == constants.ISSUER_TAB) {
+      autocomplete = (
+        <Autocomplete
+          multiple
+          id="autocomplete-issuer-tags"
+          size="small"
+          renderTags={() => null}
+          options={issuerTags ? issuerTags : [...loadedIssuerTags].splice(1, 100)}
+          classes={{
+            option: classes.option
+          }}
+          onInputChange={(event, value) => {
+            if (value.length > 2) {
+              const tags =
+                loadedIssuerTags &&
+                loadedIssuerTags.filter(tag => tag.TagName.toLowerCase().includes(value.toLowerCase()));
+              setIssuerTags(tags);
+            }
+          }}
+          onChange={(event, newValue) => {
+            setTags(newValue);
+            const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+            dispatch(userActions.storeSavedTags(selectedTags));
+            setIssuerTags(null);
+          }}
+          getOptionLabel={option => option.TagName}
+          groupBy={option => option.UniqueIdentifier}
+          renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
+        />
+      );
+    } else {
+      autocomplete = loadedStaticTags && (
+        <Autocomplete
+          multiple
+          id="autocomplete-static-tags"
+          size="small"
+          renderTags={() => null}
+          options={staticTags ? staticTags : loadedStaticTags}
+          classes={{
+            option: classes.option
+          }}
+          onInputChange={(event, value) => {
+            if (value.length > 2) {
+              const tags =
+                loadedStaticTags &&
+                loadedStaticTags.filter(tag => tag.TagName.toLowerCase().includes(value.toLowerCase()));
+              setStaticTags(tags);
+            }
+          }}
+          onChange={(event, newValue) => {
+            setTags(newValue);
+            // Try and not put the static reference in tag name
+            const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
+            dispatch(userActions.storeSavedTags(selectedTags));
+            setStaticTags(null);
+          }}
+          getOptionLabel={option => option.TagName}
+          groupBy={option => option.UniqueIdentifier}
+          renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
+        />
+      );
+    }
+  }
   const renderGroup = params => [
     <ListSubheader key={params.key} component="div">
       {params.key}
@@ -39,98 +176,10 @@ export const AutocompleteComponent = props => {
   ];
 
   return (
-    <div className={classes.root}>
-      <Autocomplete
-        className={classes.autocomplte}
-        multiple
-        id="autocomplete-tags"
-        size="small"
-        options={labels}
-        onChange={(event, newValue) => {
-          setTags(newValue);
-        }}
-        getOptionLabel={option => option.name}
-        groupBy={option => option.color}
-        renderInput={params => <TextField {...params} variant="outlined" label="Search Tags.." />}
-      />
-    </div>
+    <React.Fragment>
+      <div className={classes.root}>{autocomplete}</div>
+    </React.Fragment>
   );
 };
-
-// const options = labels.map(option => {
-//   const firstLetter = option.title[0].toUpperCase();
-//   return {
-//     firstLetter: /[0-9]/.test(firstLetter) ? "0-9" : firstLetter,
-//     ...option
-//   };
-// });
-
-const labels = [
-  {
-    name: "Primary Identfier: BL1229162",
-    color: "BL1229162",
-    description: ""
-  },
-  {
-    name: "Description: TL 1L EUR",
-    color: "BL1229162",
-    description: ""
-  },
-  {
-    name: "#Industry",
-    color: "#b60205",
-    description: ""
-  },
-  {
-    name: "#AAPL",
-    color: "#d93f0b",
-    description: ""
-  },
-  {
-    name: "#JPN",
-    color: "#0e8a16",
-    description: ""
-  },
-  {
-    name: "#BYN",
-    color: "#fbca04",
-    description: ""
-  },
-  {
-    name: "#MSFT",
-    color: "#fec1c1",
-    description: ""
-  },
-  {
-    name: "#AMZN",
-    color: "#215cea",
-    description: ""
-  },
-  {
-    name: "#ConsumerGoods",
-    color: "#cfd3d7",
-    description: ""
-  },
-  {
-    name: "#ConsumerElectronics",
-    color: "#fef2c0",
-    description: ""
-  },
-  {
-    name: "InvestorReport",
-    color: "#eeeeee",
-    description: ""
-  },
-  {
-    name: "CashProjection",
-    color: "#d73a4a",
-    description: "Cash related notes"
-  },
-  {
-    name: "Sector",
-    color: "#d4c5f9",
-    description: "Sector Info"
-  }
-];
 
 export default AutocompleteComponent;
