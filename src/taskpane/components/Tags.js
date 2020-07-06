@@ -12,7 +12,7 @@ import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
 import Container from "@material-ui/core/Container";
 import AddIcon from "@material-ui/icons/Add";
-import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
+import SendIcon from "@material-ui/icons/Send";
 import Loader from "./Loader";
 import { purple } from "@material-ui/core/colors";
 import { Tabs, Tab, Divider } from "@material-ui/core";
@@ -310,7 +310,7 @@ const Tags = props => {
         variant="outlined"
         color="primary"
         className={classes.tagButton}
-        endIcon={<ArrowUpwardIcon />}
+        endIcon={<SendIcon />}
         onClick={clickTags}
       >
         PUSH TO RMS
