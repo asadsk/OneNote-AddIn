@@ -98,6 +98,7 @@ export const AutocompleteComponent = props => {
             setTags(newValue);
             const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
             dispatch(userActions.storeSavedTags(selectedTags));
+            newValue.splice(0, newValue.length);
             setAssetTags(null);
           }}
           getOptionLabel={option => option.TagName}
@@ -128,6 +129,7 @@ export const AutocompleteComponent = props => {
             setTags(newValue);
             const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
             dispatch(userActions.storeSavedTags(selectedTags));
+            newValue.splice(0, newValue.length);
             setIssuerTags(null);
           }}
           getOptionLabel={option => option.TagName}
@@ -156,9 +158,9 @@ export const AutocompleteComponent = props => {
           }}
           onChange={(event, newValue) => {
             setTags(newValue);
-            // Try and not put the static reference in tag name
             const selectedTags = tagState.savedTags ? newValue.concat(tagState.savedTags).unique() : newValue;
             dispatch(userActions.storeSavedTags(selectedTags));
+            newValue.splice(0, newValue.length);
             setStaticTags(null);
           }}
           getOptionLabel={option => option.TagName}
