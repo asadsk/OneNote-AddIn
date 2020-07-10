@@ -2,10 +2,10 @@
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="TaskPaneApp">
   <Id>e2065794-beeb-409e-8aa5-26f2730828d8</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Contoso</ProviderName>
+  <ProviderName>Capital Four</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Capital Four OneNote AddIn"/>
-  <Description DefaultValue="Capital Four OneNote AddIn."/>
+  <Description DefaultValue="This add-in works with Capital Four Research Management System to store and retrieve tags for OneNote notes."/>
   <IconUrl DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/cap4_logo_black-80.png"/>
   <HighResolutionIconUrl DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/cap4_logo_black-80.png"/>
   <SupportUrl DefaultValue="https://www.capital-four.com/"/>
@@ -78,7 +78,7 @@
       </bt:ShortStrings>
       <bt:LongStrings>
         <bt:String id="GetStarted.Description" DefaultValue="Your Capital Four add-in loaded succesfully. Go to the HOME tab and click the 'Show Taskpane' button to get started."/>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show Open Add-In"/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show Capital Four OneNote Add-In"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>
