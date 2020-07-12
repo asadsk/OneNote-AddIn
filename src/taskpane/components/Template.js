@@ -81,10 +81,8 @@ const Template = props => {
       const templateName = element;
       templateTextFields[templateName] = "";
     });
-    console.log(templateTextFields);
 
     setTemplateText(templateTextFields);
-    console.log(templateFields);
     dispatch(userActions.saveTemplateFields(templateFields));
   }
 
@@ -175,9 +173,6 @@ const Template = props => {
             return;
           }
         }
-      }
-      if (textFieldEntries) {
-        console.log(textFieldEntries);
       }
       // Queue a command to add a page to the current section.
       var page = context.application.getActivePage();

@@ -154,8 +154,6 @@ const App = props => {
     const page = context.application.getActivePage();
     const restApiId = page.getRestApiId();
     return context.sync().then(function() {
-      console.log("Init page is :" + restApiId.value);
-      // setInitPage(restApiId.value)
       localStorage.removeItem("activePage");
       localStorage.setItem("activePage", restApiId.value);
     });
@@ -183,7 +181,6 @@ const App = props => {
           if (activePage && activePage != restApiId.value) {
             // setActivePage(restApiId.value);
             setValue(0);
-            console.log("Active Page Updated");
             localStorage.setItem("activePage", restApiId.value);
           }
         });
@@ -225,7 +222,6 @@ const App = props => {
     if (!loadedAssetTags || !loadedIssuerTags || !loadedStaticTags) {
       Promise.all([userService.getAllAssetTags(), userService.getAllIssuerTags(), userService.getAllStaticTags()]).then(
         responses => {
-          //console.log("These are the promise all response" + responses);
           setTags(responses);
           const sortedStaticTags = responses[2];
           sortedStaticTags.sort((a, b) =>
@@ -245,11 +241,8 @@ const App = props => {
       const restApiId = page.getRestApiId();
       return context.sync().then(async function() {
         setActivePage(restApiId.value);
-        console.log("Current Active page is this :" + restApiId.value);
-        //if (!tagState.savedTags) {
         const savedTags = await userService.getAllSavedTags(restApiId.value);
         dispatch(userActions.storeSavedTags(JSON.parse(savedTags)));
-        //}
       });
     }).catch(function(error) {
       console.log("Error: " + error);
