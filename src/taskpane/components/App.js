@@ -11,6 +11,7 @@ import Chip from "@material-ui/core/Chip";
 import DateFnsUtils from "@date-io/date-fns";
 import Container from "@material-ui/core/Container";
 import Loader from "./Loader";
+import Skeleton from "@material-ui/lab/Skeleton";
 import AddIcon from "@material-ui/icons/Add";
 import { purple } from "@material-ui/core/colors";
 import Grid from "@material-ui/core/Grid";
@@ -114,7 +115,10 @@ const useStyles = makeStyles(theme => ({
     height: 20
   },
   tabPanel: {
-    width: 281
+    width: "100%"
+  },
+  skeleton: {
+    height: 150
   }
 }));
 
@@ -230,8 +234,11 @@ const App = props => {
           dispatch(userActions.loadAssetTags(responses[0]));
           dispatch(userActions.loadIssuerTags(responses[1]));
           dispatch(userActions.loadStaticTags(sortedStaticTags));
+          setLoaderState(false);
         }
       );
+    } else {
+      setLoaderState(false);
     }
     await OneNote.run(async context => {
       const page = context.application.getActivePage();
@@ -243,7 +250,6 @@ const App = props => {
         const savedTags = await userService.getAllSavedTags(restApiId.value);
         dispatch(userActions.storeSavedTags(JSON.parse(savedTags)));
         //}
-        setLoaderState(false);
       });
     }).catch(function(error) {
       console.log("Error: " + error);
@@ -282,7 +288,11 @@ const App = props => {
               <Divider />
               <TabPanel className={classes.tabPanel} value={value} index={1}>
                 <div>{loaderComponent}</div>
-                <Tags tags={tags} />
+                {loaderState ? (
+                  <Skeleton className={classes.skeleton} variant="rect" width="100%"></Skeleton>
+                ) : (
+                  <Tags tags={tags} />
+                )}
               </TabPanel>
             </React.Fragment>
           </Paper>
