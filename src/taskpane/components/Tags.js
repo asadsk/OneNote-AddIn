@@ -145,7 +145,6 @@ const Tags = props => {
   const selectedTags = tagState.savedTags;
 
   const groupedTags = selectedTags && groupBy(selectedTags, "UniqueIdentifier");
-  console.log(groupedTags);
 
   function groupBy(array, key) {
     // Return the end result
