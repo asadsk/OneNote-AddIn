@@ -11,6 +11,7 @@ import Chip from "@material-ui/core/Chip";
 import DateFnsUtils from "@date-io/date-fns";
 import Container from "@material-ui/core/Container";
 import Loader from "./Loader";
+import Skeleton from "@material-ui/lab/Skeleton";
 import AddIcon from "@material-ui/icons/Add";
 import { purple } from "@material-ui/core/colors";
 import Grid from "@material-ui/core/Grid";
@@ -114,7 +115,10 @@ const useStyles = makeStyles(theme => ({
     height: 20
   },
   tabPanel: {
-    width: 281
+    width: "100%"
+  },
+  skeleton: {
+    height: 150
   }
 }));
 
@@ -150,8 +154,6 @@ const App = props => {
     const page = context.application.getActivePage();
     const restApiId = page.getRestApiId();
     return context.sync().then(function() {
-      console.log("Init page is :" + restApiId.value);
-      // setInitPage(restApiId.value)
       localStorage.removeItem("activePage");
       localStorage.setItem("activePage", restApiId.value);
     });
@@ -179,7 +181,6 @@ const App = props => {
           if (activePage && activePage != restApiId.value) {
             // setActivePage(restApiId.value);
             setValue(0);
-            console.log("Active Page Updated");
             localStorage.setItem("activePage", restApiId.value);
           }
         });
@@ -221,7 +222,6 @@ const App = props => {
     if (!loadedAssetTags || !loadedIssuerTags || !loadedStaticTags) {
       Promise.all([userService.getAllAssetTags(), userService.getAllIssuerTags(), userService.getAllStaticTags()]).then(
         responses => {
-          //console.log("These are the promise all response" + responses);
           setTags(responses);
           const sortedStaticTags = responses[2];
           sortedStaticTags.sort((a, b) =>
@@ -230,20 +230,19 @@ const App = props => {
           dispatch(userActions.loadAssetTags(responses[0]));
           dispatch(userActions.loadIssuerTags(responses[1]));
           dispatch(userActions.loadStaticTags(sortedStaticTags));
+          setLoaderState(false);
         }
       );
+    } else {
+      setLoaderState(false);
     }
     await OneNote.run(async context => {
       const page = context.application.getActivePage();
       const restApiId = page.getRestApiId();
       return context.sync().then(async function() {
         setActivePage(restApiId.value);
-        console.log("Current Active page is this :" + restApiId.value);
-        //if (!tagState.savedTags) {
         const savedTags = await userService.getAllSavedTags(restApiId.value);
         dispatch(userActions.storeSavedTags(JSON.parse(savedTags)));
-        //}
-        setLoaderState(false);
       });
     }).catch(function(error) {
       console.log("Error: " + error);
@@ -282,7 +281,11 @@ const App = props => {
               <Divider />
               <TabPanel className={classes.tabPanel} value={value} index={1}>
                 <div>{loaderComponent}</div>
-                <Tags tags={tags} />
+                {loaderState ? (
+                  <Skeleton className={classes.skeleton} variant="rect" width="100%"></Skeleton>
+                ) : (
+                  <Tags tags={tags} />
+                )}
               </TabPanel>
             </React.Fragment>
           </Paper>
