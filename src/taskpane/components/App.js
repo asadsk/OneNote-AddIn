@@ -219,7 +219,14 @@ const App = props => {
   async function handleTabChange(event, newValue) {
     setLoaderState(true);
     setValue(newValue);
-    if (!loadedAssetTags || !loadedIssuerTags || !loadedStaticTags) {
+    if (
+      !loadedAssetTags ||
+      loadedAssetTags.length == 0 ||
+      !loadedIssuerTags ||
+      loadedIssuerTags.length == 0 ||
+      !loadedStaticTags ||
+      loadedStaticTags.length == 0
+    ) {
       Promise.all([userService.getAllAssetTags(), userService.getAllIssuerTags(), userService.getAllStaticTags()]).then(
         responses => {
           setTags(responses);
