@@ -204,10 +204,16 @@ const Tags = props => {
   async function clickTags() {
     setSelectedTagsState(true);
     let noteId;
+    let webUrl;
+    let title;
     await OneNote.run(async context => {
       const page = context.application.getActivePage();
+      page.load("webUrl");
+      page.load("title");
       const restApiId = page.getRestApiId();
       return context.sync().then(function() {
+        webUrl = page.webUrl;
+        title = page.title;
         noteId = restApiId.value;
       });
     }).catch(function(error) {
@@ -218,7 +224,7 @@ const Tags = props => {
     });
     noteId = noteId.replace(/[{}]/g, "");
     selectedTags && selectedTags.forEach(x => (x.NoteId = noteId));
-    const savedNoteTags = await userService.saveTags(selectedTags);
+    const savedNoteTags = await userService.saveTags(selectedTags, webUrl, title);
     dispatch(userActions.storeSavedTags(JSON.parse(savedNoteTags)));
     setSavedTags(JSON.parse(savedNoteTags));
     setTagsSaved(true);
