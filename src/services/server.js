@@ -7,7 +7,8 @@ export const userService = {
   saveTags,
   getAllTemplates,
   getTemplateFields,
-  getAllSavedTags
+  getAllSavedTags,
+  validateNotebookOwner
 };
 
 async function getAllAssetTags() {
@@ -76,4 +77,15 @@ async function getTemplateFields(templateId) {
   );
 
   return templates;
+}
+
+async function validateNotebookOwner(notebookId) {
+  const result = await restApis._get(
+    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/ValidateNoteBookOwner?" +
+      new URLSearchParams({
+        notebookId: notebookId
+      })
+  );
+
+  return result;
 }
