@@ -314,6 +314,7 @@ const Tags = props => {
         type="submit"
         variant="outlined"
         color="primary"
+        disabled={tagState.pushNotesButtonState}
         className={classes.tagButton}
         endIcon={<SendIcon />}
         onClick={clickTags}
