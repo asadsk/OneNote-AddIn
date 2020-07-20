@@ -224,7 +224,7 @@ const Tags = props => {
     });
     noteId = noteId.replace(/[{}]/g, "");
     selectedTags && selectedTags.forEach(x => (x.NoteId = noteId));
-    const savedNoteTags = await userService.saveTags(selectedTags, webUrl, title);
+    const savedNoteTags = await userService.saveTags(selectedTags, webUrl, title, noteId);
     dispatch(userActions.storeSavedTags(JSON.parse(savedNoteTags)));
     setSavedTags(JSON.parse(savedNoteTags));
     setTagsSaved(true);
