@@ -46,11 +46,12 @@ async function getAllSavedTags(activePageId) {
   return staticTags;
 }
 
-async function saveTags(tags, webUrl, title) {
+async function saveTags(tags, webUrl, title, noteId) {
   const payload = {
     tags: tags,
     noteLink: webUrl,
-    title: title
+    title: title,
+    pageId: noteId
   };
   const staticTags = await restApis._post(
     "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/SaveTags",
