@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TemplateContent from "./TemplateContent";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
+import Grid from "@material-ui/core/Grid";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import Button from "@material-ui/core/Button";
@@ -74,6 +75,7 @@ const Template = props => {
     if (event.target.value) {
       setDisabled(false);
     }
+    dispatch(userActions.setSelectedTemplate(event.target.value));
     const templateFields = await userService.getTemplateFields(event.target.value);
     setTemplateFields(templateFields);
     let templateTextFields = {};
@@ -107,57 +109,59 @@ const Template = props => {
 
   return (
     <div className={classes.templateContainer}>
-      <FormControl className={classes.formControl}>
-        <InputLabel shrink id="noteTypeLabel">
-          Select Note Type*
-        </InputLabel>
-        <Select
-          value={type}
-          onOpen={getAllTemplates}
-          onChange={handleChange}
-          displayEmpty
-          className={classes.selectEmpty}
-        >
-          {templates &&
-            templates.map(item => (
-              <MenuItem className={classes.templateTypes} value={item.TemplateId}>
-                <Typography variant="body2">{item.TemplateName}</Typography>
-              </MenuItem>
+      <Grid>
+        <FormControl className={classes.formControl}>
+          <InputLabel shrink id="noteTypeLabel">
+            Select Note Type*
+          </InputLabel>
+          <Select
+            value={type}
+            onOpen={getAllTemplates}
+            onChange={handleChange}
+            displayEmpty
+            className={classes.selectEmpty}
+          >
+            {templates &&
+              templates.map(item => (
+                <MenuItem className={classes.templateTypes} value={item.TemplateId}>
+                  <Typography variant="body2">{item.TemplateName}</Typography>
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+        <FormControl className={classes.formControl}>
+          {templateFields &&
+            templateFields.map(field => (
+              <React.Fragment>
+                <TextField
+                  onChange={handleTextChange}
+                  className={classes.textfield}
+                  size="small"
+                  required
+                  id={field}
+                  label={"Enter " + field}
+                />
+              </React.Fragment>
             ))}
-        </Select>
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        {templateFields &&
-          templateFields.map(field => (
-            <React.Fragment>
-              <TextField
-                onChange={handleTextChange}
-                className={classes.textfield}
-                size="small"
-                required
-                id={field}
-                label={"Enter " + field}
-              />
-            </React.Fragment>
-          ))}
-        <Snackbar open={alertState} autoHideDuration={6000} onClose={handleClose}>
-          <Alert className={classes.alert} onClose={handleClose} severity="error">
-            Please fill all the required fields
-          </Alert>
-        </Snackbar>
+          <Snackbar open={alertState} autoHideDuration={6000} onClose={handleClose}>
+            <Alert className={classes.alert} onClose={handleClose} severity="error">
+              Please fill all the required fields
+            </Alert>
+          </Snackbar>
 
-        <Button
-          disabled={disabled}
-          type="submit"
-          variant="outlined"
-          color="primary"
-          className={classes.button}
-          //endIcon={<AddIcon />}
-          onClick={click}
-        >
-          ADD TO NOTE
-        </Button>
-      </FormControl>
+          <Button
+            disabled={disabled}
+            type="submit"
+            variant="outlined"
+            color="primary"
+            className={classes.button}
+            //endIcon={<AddIcon />}
+            onClick={click}
+          >
+            ADD TO NOTE
+          </Button>
+        </FormControl>
+      </Grid>
     </div>
   );
 

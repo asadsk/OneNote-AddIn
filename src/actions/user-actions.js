@@ -15,7 +15,8 @@ export const userActions = {
   saveTemplateFields,
   storeSavedTags,
   setActivePageNoteId,
-  setPushNotesButtonState
+  setPushNotesButtonState,
+  setSelectedTemplate
 };
 function loadAssetTags(assetTags) {
   return { type: constants.LOAD_ASSET_TAGS, assetTags };
@@ -63,4 +64,8 @@ function setActivePageNoteId(noteId) {
 
 function setPushNotesButtonState(pushNotesButtonState) {
   return { type: constants.SET_PUSH_NOTES_BUTTON_STATE, pushNotesButtonState };
+}
+
+function setSelectedTemplate(templateId) {
+  return { type: constants.SET_SELECTED_TEMPLATE, templateId };
 }
