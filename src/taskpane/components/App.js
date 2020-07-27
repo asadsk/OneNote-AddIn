@@ -154,8 +154,8 @@ const App = props => {
     const page = context.application.getActivePage();
     const restApiId = page.getRestApiId();
     return context.sync().then(function() {
-      localStorage.removeItem("activePage");
-      localStorage.setItem("activePage", restApiId.value);
+      sessionStorage.removeItem("activePage");
+      sessionStorage.setItem("activePage", restApiId.value);
     });
   }).catch(function(error) {
     console.log("Error: " + error);
@@ -177,11 +177,11 @@ const App = props => {
         const page = context.application.getActivePage();
         const restApiId = page.getRestApiId();
         return context.sync().then(function() {
-          var activePage = localStorage.getItem("activePage");
+          var activePage = sessionStorage.getItem("activePage");
           if (activePage && activePage != restApiId.value) {
             // setActivePage(restApiId.value);
             setValue(0);
-            localStorage.setItem("activePage", restApiId.value);
+            sessionStorage.setItem("activePage", restApiId.value);
           }
         });
       }).catch(function(error) {
