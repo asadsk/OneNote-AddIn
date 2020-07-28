@@ -2,6 +2,7 @@ import * as React from "react";
 import "date-fns";
 import { makeStyles } from "@material-ui/core/styles";
 import TemplateContent from "./TemplateContent";
+import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
@@ -40,7 +41,8 @@ const useStyles = makeStyles(theme => ({
   },
 
   selectEmpty: {
-    marginTop: theme.spacing(0.5)
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.5)
   },
   templateTypes: {
     height: 10,
@@ -107,73 +109,74 @@ const Template = props => {
 
   return (
     <div className={classes.templateContainer}>
-      <FormControl className={classes.formControl}>
-        <InputLabel shrink id="noteTypeLabel">
-          Select Note Type*
-        </InputLabel>
-        <Select
-          value={type}
-          onOpen={getAllTemplates}
-          onChange={handleChange}
-          displayEmpty
-          className={classes.selectEmpty}
-        >
-          {templates &&
-            templates.map(item => (
-              <MenuItem className={classes.templateTypes} value={item.TemplateId}>
-                <Typography variant="body2">{item.TemplateName}</Typography>
-              </MenuItem>
+      <Grid>
+        <FormControl className={classes.formControl}>
+          <InputLabel shrink id="noteTypeLabel">
+            Select Note Type*
+          </InputLabel>
+          <Select
+            value={type}
+            onOpen={getAllTemplates}
+            onChange={handleChange}
+            displayEmpty
+            className={classes.selectEmpty}
+          >
+            {templates &&
+              templates.map(item => (
+                <MenuItem className={classes.templateTypes} value={item.TemplateId}>
+                  <Typography variant="body2">{item.TemplateName}</Typography>
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+        <FormControl className={classes.formControl}>
+          {templateFields &&
+            templateFields.map(field => (
+              <React.Fragment>
+                <TextField
+                  onChange={handleTextChange}
+                  className={classes.textfield}
+                  size="small"
+                  id={field}
+                  helperText={"Enter " + field}
+                />
+              </React.Fragment>
             ))}
-        </Select>
-      </FormControl>
-      <FormControl className={classes.formControl}>
-        {templateFields &&
-          templateFields.map(field => (
-            <React.Fragment>
-              <TextField
-                onChange={handleTextChange}
-                className={classes.textfield}
-                size="small"
-                required
-                id={field}
-                label={"Enter " + field}
-              />
-            </React.Fragment>
-          ))}
-        <Snackbar open={alertState} autoHideDuration={6000} onClose={handleClose}>
-          <Alert className={classes.alert} onClose={handleClose} severity="error">
-            Please fill all the required fields
-          </Alert>
-        </Snackbar>
+          {/* <Snackbar open={alertState} autoHideDuration={6000} onClose={handleClose}>
+            <Alert className={classes.alert} onClose={handleClose} severity="error">
+              Please fill all the required fields
+            </Alert>
+          </Snackbar> */}
 
-        <Button
-          disabled={disabled}
-          type="submit"
-          variant="outlined"
-          color="primary"
-          className={classes.button}
-          //endIcon={<AddIcon />}
-          onClick={click}
-        >
-          ADD TO NOTE
-        </Button>
-      </FormControl>
+          <Button
+            disabled={disabled}
+            type="submit"
+            variant="outlined"
+            color="primary"
+            className={classes.button}
+            //endIcon={<AddIcon />}
+            onClick={click}
+          >
+            ADD TO NOTE
+          </Button>
+        </FormControl>
+      </Grid>
     </div>
   );
 
   async function click() {
     await OneNote.run(async context => {
-      const textFieldEntries = Object.entries(templateText);
-      if (Object.keys(templateText).length > 0) {
-        const values = Object.values(templateText);
-        for (let index = 0; index < values.length; index++) {
-          const element = values[index];
-          if (element == "") {
-            setAlertState(true);
-            return;
-          }
-        }
-      }
+      // const textFieldEntries = Object.entries(templateText);
+      // if (Object.keys(templateText).length > 0) {
+      //   const values = Object.values(templateText);
+      //   for (let index = 0; index < values.length; index++) {
+      //     const element = values[index];
+      //     // if (element == "") {
+      //     //   setAlertState(true);
+      //     //   return;
+      //     // }
+      //   }
+      // }
       // Queue a command to add a page to the current section.
       var page = context.application.getActivePage();
       page.addOutline(40, 70, "<p></p>");
