@@ -189,11 +189,11 @@ const Template = props => {
           if (pageContents.items.length != 0 && pageContents.items[0].type == "Outline") {
             // First item is an outline.
             var outline = pageContents.items[0].outline;
-            Object.entries(templateText).map(field => {
+            Object.entries(templateText).map((field,index) => {
               outline.appendHtml(
                 "<table border='border-collapse'> \
                                     <tr> \
-                                      <td style='border: 1px solid black;'><B><I> ##" +
+                                      <td style='border: 1px solid black;'><B><I> " + ++index + ". " + 
                   field[0] +
                   ": </I></B></td> \
                                       <td style='border: 1px solid black;'>" +
@@ -202,6 +202,7 @@ const Template = props => {
                                     </tr> \
                                 </table>"
               );
+              
             });
 
             return context.sync();
