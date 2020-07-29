@@ -237,9 +237,9 @@ const App = props => {
           dispatch(userActions.loadAssetTags(responses[0]));
           dispatch(userActions.loadIssuerTags(responses[1]));
           dispatch(userActions.loadStaticTags(sortedStaticTags));
-          setLoaderState(false);
         }
       );
+      setLoaderState(false);
     } else {
       setLoaderState(false);
     }
