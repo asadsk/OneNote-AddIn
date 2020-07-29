@@ -5,6 +5,7 @@ import TemplateContent from "./TemplateContent";
 import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
+import Grid from "@material-ui/core/Grid";
 import Select from "@material-ui/core/Select";
 import InputLabel from "@material-ui/core/InputLabel";
 import Button from "@material-ui/core/Button";
@@ -76,6 +77,7 @@ const Template = props => {
     if (event.target.value) {
       setDisabled(false);
     }
+    dispatch(userActions.setSelectedTemplate(event.target.value));
     const templateFields = await userService.getTemplateFields(event.target.value);
     setTemplateFields(templateFields);
     let templateTextFields = {};
@@ -189,11 +191,13 @@ const Template = props => {
           if (pageContents.items.length != 0 && pageContents.items[0].type == "Outline") {
             // First item is an outline.
             var outline = pageContents.items[0].outline;
-            Object.entries(templateText).map((field,index) => {
+            Object.entries(templateText).map((field, index) => {
               outline.appendHtml(
                 "<table border='border-collapse'> \
                                     <tr> \
-                                      <td style='border: 1px solid black;'><B><I> " + ++index + ". " + 
+                                      <td style='border: 1px solid black;'><B><I> " +
+                  ++index +
+                  ". " +
                   field[0] +
                   ": </I></B></td> \
                                       <td style='border: 1px solid black;'>" +
@@ -202,7 +206,6 @@ const Template = props => {
                                     </tr> \
                                 </table>"
               );
-              
             });
 
             return context.sync();

@@ -11,7 +11,8 @@ const initialState = {
   templateFields: null,
   savedTags: null,
   activePageNoteId: null,
-  pushNotesButtonState: null
+  pushNotesButtonState: null,
+  templateId: null
 };
 export function tags(state = initialState, action) {
   switch (action.type) {
@@ -74,6 +75,11 @@ export function tags(state = initialState, action) {
       return {
         ...state,
         pushNotesButtonState: action.pushNotesButtonState
+      };
+    case constants.SET_SELECTED_TEMPLATE:
+      return {
+        ...state,
+        templateId: action.templateId
       };
     default:
       return state;
