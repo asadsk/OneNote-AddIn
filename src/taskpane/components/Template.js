@@ -2,6 +2,7 @@ import * as React from "react";
 import "date-fns";
 import { makeStyles } from "@material-ui/core/styles";
 import TemplateContent from "./TemplateContent";
+import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
@@ -41,7 +42,8 @@ const useStyles = makeStyles(theme => ({
   },
 
   selectEmpty: {
-    marginTop: theme.spacing(0.5)
+    marginTop: theme.spacing(0.5),
+    marginBottom: theme.spacing(0.5)
   },
   templateTypes: {
     height: 10,
@@ -137,17 +139,16 @@ const Template = props => {
                   onChange={handleTextChange}
                   className={classes.textfield}
                   size="small"
-                  required
                   id={field}
-                  label={"Enter " + field}
+                  helperText={"Enter " + field}
                 />
               </React.Fragment>
             ))}
-          <Snackbar open={alertState} autoHideDuration={6000} onClose={handleClose}>
+          {/* <Snackbar open={alertState} autoHideDuration={6000} onClose={handleClose}>
             <Alert className={classes.alert} onClose={handleClose} severity="error">
               Please fill all the required fields
             </Alert>
-          </Snackbar>
+          </Snackbar> */}
 
           <Button
             disabled={disabled}
@@ -167,17 +168,17 @@ const Template = props => {
 
   async function click() {
     await OneNote.run(async context => {
-      const textFieldEntries = Object.entries(templateText);
-      if (Object.keys(templateText).length > 0) {
-        const values = Object.values(templateText);
-        for (let index = 0; index < values.length; index++) {
-          const element = values[index];
-          if (element == "") {
-            setAlertState(true);
-            return;
-          }
-        }
-      }
+      // const textFieldEntries = Object.entries(templateText);
+      // if (Object.keys(templateText).length > 0) {
+      //   const values = Object.values(templateText);
+      //   for (let index = 0; index < values.length; index++) {
+      //     const element = values[index];
+      //     // if (element == "") {
+      //     //   setAlertState(true);
+      //     //   return;
+      //     // }
+      //   }
+      // }
       // Queue a command to add a page to the current section.
       var page = context.application.getActivePage();
       page.addOutline(40, 70, "<p></p>");
@@ -190,11 +191,13 @@ const Template = props => {
           if (pageContents.items.length != 0 && pageContents.items[0].type == "Outline") {
             // First item is an outline.
             var outline = pageContents.items[0].outline;
-            Object.entries(templateText).map(field => {
+            Object.entries(templateText).map((field, index) => {
               outline.appendHtml(
                 "<table border='border-collapse'> \
                                     <tr> \
-                                      <td style='border: 1px solid black;'><B><I> ##" +
+                                      <td style='border: 1px solid black;'><B><I> " +
+                  ++index +
+                  ". " +
                   field[0] +
                   ": </I></B></td> \
                                       <td style='border: 1px solid black;'>" +
