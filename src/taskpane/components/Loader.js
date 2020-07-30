@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles(theme => ({
   circular: {
@@ -14,8 +15,7 @@ const useStyles = makeStyles(theme => ({
     // },
   },
   loaderMessage: {
-    width: "100%",
-    marginLeft: 100
+    //marginLeft: 100
   }
 }));
 
@@ -32,10 +32,11 @@ export const Loader = props => {
   return (
     <div>
       {loader}
-      <Typography className={classes.loaderMessage} variant="caption">
-        {" "}
-        {props.loaderText}
-      </Typography>
+      <Grid container justify="center">
+        <Typography className={classes.loaderMessage} variant="caption">
+          {props.loaderText}
+        </Typography>
+      </Grid>
     </div>
   );
 };

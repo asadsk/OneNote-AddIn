@@ -11,8 +11,10 @@ import SubTabPanel from "./SubTab";
 import Box from "@material-ui/core/Box";
 import Chip from "@material-ui/core/Chip";
 import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
 import AddIcon from "@material-ui/icons/Add";
 import SendIcon from "@material-ui/icons/Send";
+import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import Loader from "./Loader";
 import { purple } from "@material-ui/core/colors";
 import { Tabs, Tab, Divider } from "@material-ui/core";
@@ -63,7 +65,6 @@ const useStyles = makeStyles(theme => ({
     marginBottom: 0
   },
   tagButton: {
-    marginLeft: 56,
     marginTop: theme.spacing(1)
   },
   paper: {
@@ -135,6 +136,7 @@ const Tags = props => {
   const [savedTags, setSavedTags] = useState([]);
   const [tagsSaved, setTagsSaved] = useState(false);
   const [selectedTagsState, setSelectedTagsState] = useState();
+  const [deleteClicked, setDeleteClicked] = useState();
   const classes = useStyles();
   const dispatch = useDispatch();
   const tagState = useSelector(state => state.tags);
@@ -158,7 +160,9 @@ const Tags = props => {
 
   let loaderComponent;
   if (selectedTagsState) {
-    loaderComponent = loaderComponent = <Loader type="circular" loaderText="Saving Tags..." />;
+    loaderComponent = loaderComponent = (
+      <Loader type="circular" loaderText={deleteClicked ? "Deleting note from RMS.." : "Pushing note to RMS..."} />
+    );
   }
 
   const handleDelete = tag => {
@@ -233,6 +237,30 @@ const Tags = props => {
     setSavedTags(JSON.parse(savedNoteTags));
     setTagsSaved(true);
     setSelectedTagsState(false);
+  }
+
+  async function deleteNote() {
+    setDeleteClicked(true);
+    setSelectedTagsState(true);
+    let noteId;
+    await OneNote.run(async context => {
+      const page = context.application.getActivePage();
+      const restApiId = page.getRestApiId();
+      return context.sync().then(function() {
+        noteId = restApiId.value;
+      });
+    }).catch(function(error) {
+      console.log("Error: " + error);
+      if (error instanceof OfficeExtension.Error) {
+        console.log("Debug info: " + JSON.stringify(error.debugInfo));
+      }
+    });
+    noteId = noteId.replace(/[{}]/g, "");
+    userService.deleteNoteFromRMS(noteId).then(() => {
+      dispatch(userActions.storeSavedTags(null));
+      setSavedTags(null);
+      setSelectedTagsState(false);
+    });
   }
 
   function a11yProps(index) {
@@ -314,17 +342,30 @@ const Tags = props => {
           </div>
         )}
       </Paper>
-      <Button
-        type="submit"
-        variant="outlined"
-        color="primary"
-        disabled={tagState.pushNotesButtonState}
-        className={classes.tagButton}
-        endIcon={<SendIcon />}
-        onClick={clickTags}
-      >
-        PUSH TO RMS
-      </Button>
+      <Grid container justify="center">
+        <Button
+          type="submit"
+          variant="outlined"
+          color="primary"
+          disabled={tagState.pushNotesButtonState}
+          className={classes.tagButton}
+          endIcon={<SendIcon />}
+          onClick={clickTags}
+        >
+          PUSH TO RMS
+        </Button>
+        <Button
+          type="submit"
+          variant="outlined"
+          color="primary"
+          disabled={tagState.pushNotesButtonState}
+          className={classes.tagButton}
+          endIcon={<DeleteForeverIcon />}
+          onClick={deleteNote}
+        >
+          DELETE FROM RMS
+        </Button>
+      </Grid>
     </React.Fragment>
   );
 };

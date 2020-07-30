@@ -9,7 +9,8 @@ export const userService = {
   getTemplateFields,
   getAllSavedTags,
   validateNotebookOwner,
-  saveTemplateNoteMap
+  saveTemplateNoteMap,
+  deleteNoteFromRMS
 };
 
 async function getAllAssetTags() {
@@ -99,4 +100,13 @@ async function saveTemplateNoteMap(templateId, noteId) {
     noteId: noteId
   };
   await restApis._post("https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/SaveTemplateNoteMap", payload);
+}
+
+async function deleteNoteFromRMS(noteId) {
+  await restApis._delete(
+    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/DeleteNoteFromRMS?" +
+      new URLSearchParams({
+        noteId: noteId
+      })
+  );
 }
