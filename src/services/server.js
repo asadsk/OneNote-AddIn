@@ -4,17 +4,19 @@ export const userService = {
   getAllAssetTags,
   getAllIssuerTags,
   getAllStaticTags,
-  SaveNoteInfo,
+  saveTags,
   getAllTemplates,
   getTemplateFields,
   getAllSavedTags,
-  validateNotebookOwner,
-  saveTemplateNoteMap
+  validateNotebookOwner
 };
+
+//const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn"
+const ADDIN_URL = "https://localhost:5001" 
 
 async function getAllAssetTags() {
   const assetTags = await restApis._getAll(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/GetAllAssetTags"
+    `${ADDIN_URL}/GetAllAssetTags`
   );
 
   return assetTags;
@@ -22,7 +24,7 @@ async function getAllAssetTags() {
 
 async function getAllIssuerTags() {
   const issuerTags = await restApis._getAll(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/GetAllIssuerTags"
+    `${ADDIN_URL}/GetAllIssuerTags`
   );
 
   return issuerTags;
@@ -30,42 +32,41 @@ async function getAllIssuerTags() {
 
 async function getAllStaticTags() {
   const staticTags = await restApis._getAll(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/GetAllStaticTags"
+    `${ADDIN_URL}/GetAllStaticTags`
   );
 
   return staticTags;
 }
 
 async function getAllSavedTags(activePageId) {
-  const savedTags = await restApis._get(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/GetAllSavedTags?" +
+  const staticTags = await restApis._get(
+    `${ADDIN_URL}/GetAllSavedTags?` +
       new URLSearchParams({
         noteId: activePageId
       })
   );
 
-  return savedTags;
+  return staticTags;
 }
 
-async function SaveNoteInfo(tags, webUrl, title, noteId, templateId) {
+async function saveTags(tags, webUrl, title, noteId) {
   const payload = {
     tags: tags,
     noteLink: webUrl,
     title: title,
-    pageId: noteId,
-    templateId: templateId
+    pageId: noteId
   };
-  const savedTags = await restApis._post(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/SaveNoteInfo",
+  const staticTags = await restApis._post(
+    `${ADDIN_URL}/SaveTags`,
     payload
   );
 
-  return savedTags;
+  return staticTags;
 }
 
 async function getAllTemplates() {
   const templates = await restApis._getAll(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/GetAllNoteTemplates"
+    `${ADDIN_URL}/GetAllNoteTemplates`
   );
 
   return templates;
@@ -73,7 +74,7 @@ async function getAllTemplates() {
 
 async function getTemplateFields(templateId) {
   const templates = await restApis._get(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/GetTemplateFields?" +
+    `${ADDIN_URL}/GetTemplateFields?` +
       new URLSearchParams({
         id: templateId
       })
@@ -84,19 +85,11 @@ async function getTemplateFields(templateId) {
 
 async function validateNotebookOwner(notebookId) {
   const result = await restApis._get(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/ValidateNoteBookOwner?" +
+    `${ADDIN_URL}/ValidateNoteBookOwner?` +
       new URLSearchParams({
         notebookId: notebookId
       })
   );
 
   return result;
-}
-
-async function saveTemplateNoteMap(templateId, noteId) {
-  const payload = {
-    templateId: templateId,
-    noteId: noteId
-  };
-  await restApis._post("https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/SaveTemplateNoteMap", payload);
 }
