@@ -2,7 +2,6 @@ import * as React from "react";
 import "date-fns";
 import { makeStyles } from "@material-ui/core/styles";
 import TemplateContent from "./TemplateContent";
-import Grid from "@material-ui/core/Grid";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Grid from "@material-ui/core/Grid";
