@@ -143,7 +143,7 @@ const Tags = props => {
   let loadedIssuerTags;
   let loadedStaticTags;
   const selectedTags = tagState.savedTags;
-  const templateId = tagState.templateId;
+  let templateId = tagState.templateId;
   const groupedTags = selectedTags && groupBy(selectedTags, "UniqueIdentifier");
 
   function groupBy(array, key) {
@@ -225,6 +225,9 @@ const Tags = props => {
     noteId = noteId.replace(/[{}]/g, "");
     selectedTags && selectedTags.forEach(x => (x.NoteId = noteId));
     //await userService.saveTemplateNoteMap(templateId, noteId);
+    if (!templateId) {
+      templateId = 3;
+    }
     const savedNoteTags = await userService.SaveNoteInfo(selectedTags, webUrl, title, noteId, templateId);
     dispatch(userActions.storeSavedTags(JSON.parse(savedNoteTags)));
     setSavedTags(JSON.parse(savedNoteTags));
