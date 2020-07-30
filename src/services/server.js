@@ -11,12 +11,18 @@ export const userService = {
   validateNotebookOwner
 };
 
-//const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn"
-const ADDIN_URL = "https://localhost:5001" 
+//UAT
+const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net"
+
+//PROD
+//const ADDIN_URL = "https://cfrms-onenote.azurewebsites.net"
+
+//LOCAL
+//const ADDIN_URL = "https://localhost:5001" 
 
 async function getAllAssetTags() {
   const assetTags = await restApis._getAll(
-    `${ADDIN_URL}/GetAllAssetTags`
+    `${ADDIN_URL}/api/OneNoteAddIn/GetAllAssetTags`
   );
 
   return assetTags;
@@ -24,7 +30,7 @@ async function getAllAssetTags() {
 
 async function getAllIssuerTags() {
   const issuerTags = await restApis._getAll(
-    `${ADDIN_URL}/GetAllIssuerTags`
+    `${ADDIN_URL}/api/OneNoteAddIn/GetAllIssuerTags`
   );
 
   return issuerTags;
@@ -32,7 +38,7 @@ async function getAllIssuerTags() {
 
 async function getAllStaticTags() {
   const staticTags = await restApis._getAll(
-    `${ADDIN_URL}/GetAllStaticTags`
+    `${ADDIN_URL}/api/OneNoteAddIn/GetAllStaticTags`
   );
 
   return staticTags;
@@ -40,7 +46,7 @@ async function getAllStaticTags() {
 
 async function getAllSavedTags(activePageId) {
   const staticTags = await restApis._get(
-    `${ADDIN_URL}/GetAllSavedTags?` +
+    `${ADDIN_URL}/api/OneNoteAddIn/GetAllSavedTags?` +
       new URLSearchParams({
         noteId: activePageId
       })
@@ -57,7 +63,7 @@ async function saveTags(tags, webUrl, title, noteId) {
     pageId: noteId
   };
   const staticTags = await restApis._post(
-    `${ADDIN_URL}/SaveTags`,
+    `${ADDIN_URL}/api/OneNoteAddIn/SaveTags`,
     payload
   );
 
@@ -66,7 +72,7 @@ async function saveTags(tags, webUrl, title, noteId) {
 
 async function getAllTemplates() {
   const templates = await restApis._getAll(
-    `${ADDIN_URL}/GetAllNoteTemplates`
+    `${ADDIN_URL}/api/OneNoteAddIn/GetAllNoteTemplates`
   );
 
   return templates;
@@ -74,7 +80,7 @@ async function getAllTemplates() {
 
 async function getTemplateFields(templateId) {
   const templates = await restApis._get(
-    `${ADDIN_URL}/GetTemplateFields?` +
+    `${ADDIN_URL}/api/OneNoteAddIn/GetTemplateFields?` +
       new URLSearchParams({
         id: templateId
       })
@@ -85,7 +91,7 @@ async function getTemplateFields(templateId) {
 
 async function validateNotebookOwner(notebookId) {
   const result = await restApis._get(
-    `${ADDIN_URL}/ValidateNoteBookOwner?` +
+    `${ADDIN_URL}/api/OneNoteAddIn/ValidateNoteBookOwner?` +
       new URLSearchParams({
         notebookId: notebookId
       })
