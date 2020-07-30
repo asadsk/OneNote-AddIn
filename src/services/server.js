@@ -13,7 +13,7 @@ export const userService = {
   deleteNoteFromRMS
 };
 
-const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net"
+const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net";
 
 //Prod
 //const ADDIN_URL = "https://cfrms-onenote.azurewebsites.net"
@@ -22,25 +22,19 @@ const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net"
 //const ADDIN_URL = "https://localhost:3000"
 
 async function getAllAssetTags() {
-  const assetTags = await restApis._getAll(
-    `${ADDIN_URL}/api/OneNoteAddIn/GetAllAssetTags`
-  );
+  const assetTags = await restApis._getAll(`${ADDIN_URL}/api/OneNoteAddIn/GetAllAssetTags`);
 
   return assetTags;
 }
 
 async function getAllIssuerTags() {
-  const issuerTags = await restApis._getAll(
-    `${ADDIN_URL}/api/OneNoteAddIn/GetAllIssuerTags`
-  );
+  const issuerTags = await restApis._getAll(`${ADDIN_URL}/api/OneNoteAddIn/GetAllIssuerTags`);
 
   return issuerTags;
 }
 
 async function getAllStaticTags() {
-  const staticTags = await restApis._getAll(
-    `${ADDIN_URL}/api/OneNoteAddIn/GetAllStaticTags`
-  );
+  const staticTags = await restApis._getAll(`${ADDIN_URL}/api/OneNoteAddIn/GetAllStaticTags`);
 
   return staticTags;
 }
@@ -64,18 +58,13 @@ async function SaveNoteInfo(tags, webUrl, title, noteId, templateId) {
     pageId: noteId,
     templateId: templateId
   };
-  const savedTags = await restApis._post(
-    `${ADDIN_URL}/api/OneNoteAddIn/SaveNoteInfo`,
-    payload
-  );
+  const savedTags = await restApis._post(`${ADDIN_URL}/api/OneNoteAddIn/SaveNoteInfo`, payload);
 
   return savedTags;
 }
 
 async function getAllTemplates() {
-  const templates = await restApis._getAll(
-    `${ADDIN_URL}/api/OneNoteAddIn/GetAllNoteTemplates`
-  );
+  const templates = await restApis._getAll(`${ADDIN_URL}/api/OneNoteAddIn/GetAllNoteTemplates`);
 
   return templates;
 }
@@ -112,7 +101,7 @@ async function saveTemplateNoteMap(templateId, noteId) {
 
 async function deleteNoteFromRMS(noteId) {
   await restApis._delete(
-    "https://cfrms-onenote-uat.azurewebsites.net/api/OneNoteAddIn/DeleteNoteFromRMS?" +
+    `${ADDIN_URL}/api/OneNoteAddIn/DeleteNoteFromRMS?` +
       new URLSearchParams({
         noteId: noteId
       })
