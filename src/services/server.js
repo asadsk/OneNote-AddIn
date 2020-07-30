@@ -12,7 +12,7 @@ export const userService = {
   saveTemplateNoteMap
 };
 
-const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net"
+const ADDIN_URL = "https://cfrms-onenote.azurewebsites.net"
 
 //Prod
 //const ADDIN_URL = "https://cfrms-onenote.azurewebsites.net"
