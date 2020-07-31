@@ -66,8 +66,8 @@ function _delete(url, payLoad) {
   const apiUrl = BaseUrl + url;
   const requestOptions = {
     method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ payLoad })
+    headers: { "Content-Type": "application/json" }
+    //body: JSON.stringify({ payLoad })
   };
   return fetch(apiUrl, requestOptions)
     .then(handleResponse)

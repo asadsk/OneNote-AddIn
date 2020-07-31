@@ -227,8 +227,8 @@ const App = props => {
       !loadedStaticTags ||
       loadedStaticTags.length == 0
     ) {
-      Promise.all([userService.getAllAssetTags(), userService.getAllIssuerTags(), userService.getAllStaticTags()]).then(
-        responses => {
+      Promise.all([userService.getAllAssetTags(), userService.getAllIssuerTags(), userService.getAllStaticTags()])
+        .then(responses => {
           setTags(responses);
           const sortedStaticTags = responses[2];
           sortedStaticTags.sort((a, b) =>
@@ -237,9 +237,8 @@ const App = props => {
           dispatch(userActions.loadAssetTags(responses[0]));
           dispatch(userActions.loadIssuerTags(responses[1]));
           dispatch(userActions.loadStaticTags(sortedStaticTags));
-        }
-      );
-      setLoaderState(false);
+        })
+        .then(() => setLoaderState(false));
     } else {
       setLoaderState(false);
     }
@@ -292,7 +291,7 @@ const App = props => {
               </TabPanel>
               <Divider />
               <TabPanel className={classes.tabPanel} value={value} index={1}>
-                <div>{loaderComponent}</div>
+                {loaderComponent}
                 {loaderState ? (
                   <Skeleton className={classes.skeleton} variant="rect" width="100%"></Skeleton>
                 ) : (
