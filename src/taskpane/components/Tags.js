@@ -260,6 +260,7 @@ const Tags = props => {
       dispatch(userActions.storeSavedTags(null));
       setSavedTags(null);
       setSelectedTagsState(false);
+      setDeleteClicked(false);
     });
   }
 
