@@ -249,11 +249,13 @@ const App = props => {
       const restApiId = page.getRestApiId();
       const notebookApiId = notebook.getRestApiId();
       return context.sync().then(async function() {
+        setLoaderState(true);
         setActivePage(restApiId.value);
         const isNotebookOwnerRMSUser = await userService.validateNotebookOwner(notebookApiId.value);
         dispatch(userActions.setPushNotesButtonState(!isNotebookOwnerRMSUser));
         const savedTags = await userService.getAllSavedTags(restApiId.value);
         dispatch(userActions.storeSavedTags(JSON.parse(savedTags)));
+        setLoaderState(false);
       });
     }).catch(function(error) {
       console.log("Error: " + error);
