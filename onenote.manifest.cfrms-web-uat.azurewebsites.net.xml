@@ -4,10 +4,10 @@
   <Version>1.0.0.0</Version>
   <ProviderName>Capital Four</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-  <DisplayName DefaultValue="Capital Four OneNote AddIn"/>
+  <DisplayName DefaultValue="OneNote AddIn"/>
   <Description DefaultValue="This add-in works with Capital Four Research Management System to store and retrieve tags for OneNote notes."/>
-  <IconUrl DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/cap4_logo_black-80.png"/>
-  <HighResolutionIconUrl DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/cap4_logo_black-80.png"/>
+  <IconUrl DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/IVP_Logo.png"/>
+  <HighResolutionIconUrl DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/IVP_Logo.png"/>
   <SupportUrl DefaultValue="https://www.capital-four.com/"/>
   <AppDomains>
     <AppDomain>https://cfrms-web-uat.azurewebsites.net</AppDomain>
@@ -62,9 +62,9 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/cap4_logo_black-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/cap4_logo_black-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/cap4_logo_black-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/IVP_Logo.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/IVP_Logo.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/assets/IVP_Logo.png"/>
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812"/>
@@ -74,7 +74,7 @@
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="Get started with your Capital Four Add-In!"/>
         <bt:String id="CommandsGroup.Label" DefaultValue="Capital Four"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Capital Four Add-In"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="OneNote Add-In"/>
       </bt:ShortStrings>
       <bt:LongStrings>
         <bt:String id="GetStarted.Description" DefaultValue="Your Capital Four add-in loaded succesfully. Go to the HOME tab and click the 'Show Taskpane' button to get started."/>
