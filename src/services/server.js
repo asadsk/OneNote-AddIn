@@ -13,7 +13,7 @@ export const userService = {
   deleteNoteFromRMS
 };
 
-//const ADDIN_URL = "https://cfrms-onenote-uat.azurewebsites.net";
+const ADDIN_URL = `${API_URL}`;
 
 //Prod
 //const ADDIN_URL = "https://cfrms-onenote.azurewebsites.net"

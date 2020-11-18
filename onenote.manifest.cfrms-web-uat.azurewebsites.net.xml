@@ -72,13 +72,13 @@
         <bt:Url id="Taskpane.Url" DefaultValue="https://cfrms-web-uat.azurewebsites.net/onenoteaddin/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GetStarted.Title" DefaultValue="Get started with your Capital Four Add-In!"/>
-        <bt:String id="CommandsGroup.Label" DefaultValue="Capital Four"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="OneNote Add-In"/>
+        <bt:String id="GetStarted.Title" DefaultValue="UAT - Get started with your Capital Four Add-In!"/>
+        <bt:String id="CommandsGroup.Label" DefaultValue="UAT - Capital Four"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="UAT - Capital Four Add-In"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="GetStarted.Description" DefaultValue="Your Capital Four add-in loaded succesfully. Go to the HOME tab and click the 'Show Taskpane' button to get started."/>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show Capital Four OneNote Add-In"/>
+        <bt:String id="GetStarted.Description" DefaultValue="Your Capital Four add-in for UAT loaded succesfully. Go to the HOME tab and click the 'Show Taskpane' button to get started."/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show Capital Four UAT OneNote Add-In"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

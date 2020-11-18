@@ -5,8 +5,23 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
+const API_URL = {
+  uat: 'https://cfrms-onenote-uat.azurewebsites.net',
+  production: 'https://cfrms-onenote.azurewebsites.net',
+  development: 'https://localhost:5001'
+}
+
+
 module.exports = async (env, options) => {
   const dev = options.mode === "development";
+
+  let deploymentUrlPaths = 'development' ;
+  if(env.deploymentUrlPaths){
+    deploymentUrlPaths = env.deploymentUrlPaths;
+  }
+  console.log(deploymentUrlPaths);
+  console.log(API_URL[deploymentUrlPaths]);
+
   const config = {
     devtool: "source-map",
     entry: {
@@ -42,6 +57,10 @@ module.exports = async (env, options) => {
     },
     plugins: [
       new CleanWebpackPlugin(),
+      new webpack.DefinePlugin({
+        'API_URL': JSON.stringify(API_URL[deploymentUrlPaths])
+
+      }),
       new CopyWebpackPlugin([
         {
           to: "taskpane.css",
