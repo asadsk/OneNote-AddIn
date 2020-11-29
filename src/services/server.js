@@ -19,7 +19,7 @@ const ADDIN_URL = `${API_URL}`;
 //const ADDIN_URL = "https://cfrms-onenote.azurewebsites.net"
 
 //Local
-const ADDIN_URL = "https://localhost:5001";
+//const ADDIN_URL = "https://localhost:5001";
 
 async function getAllAssetTags() {
   const assetTags = await restApis._getAll(`${ADDIN_URL}/api/OneNoteAddIn/GetAllAssetTags`);
