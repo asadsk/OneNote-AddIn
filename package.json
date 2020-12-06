@@ -15,7 +15,7 @@
     "build-prod": "webpack -p --mode production  --https false --env.deploymentUrlPaths=production",
     "build-uat": "webpack -p --mode production --https false --env.deploymentUrlPaths=uat",
     "build-dev": "webpack --mode development  --env.deploymentUrlPaths=development",
-    "build": "webpack -p --mode production --https false",
+    "build": "webpack -p --mode production --https false --env.deploymentUrlPaths=production",
     "build:dev": "webpack --mode development --https false",
     "dev-server": "webpack-dev-server --mode development",
     "lint": "office-addin-lint check",
