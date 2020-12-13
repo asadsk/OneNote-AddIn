@@ -6,17 +6,16 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 
 const API_URL = {
-  uat: 'https://cfrms-onenote-uat.azurewebsites.net',
-  production: 'https://cfrms-onenote.azurewebsites.net',
-  development: 'https://localhost:5001'
-}
-
+  uat: "https://cfrms-onenote-uat.azurewebsites.net",
+  production: "https://cfrms-onenote.azurewebsites.net",
+  development: "https://localhost:5001"
+};
 
 module.exports = async (env, options) => {
   const dev = options.mode === "development";
 
-  let deploymentUrlPaths = 'development' ;
-  if(env.deploymentUrlPaths){
+  let deploymentUrlPaths = "development";
+  if (env.deploymentUrlPaths) {
     deploymentUrlPaths = env.deploymentUrlPaths;
   }
   console.log(deploymentUrlPaths);
@@ -58,8 +57,7 @@ module.exports = async (env, options) => {
     plugins: [
       new CleanWebpackPlugin(),
       new webpack.DefinePlugin({
-        'API_URL': JSON.stringify(API_URL[deploymentUrlPaths])
-
+        API_URL: JSON.stringify(API_URL[deploymentUrlPaths])
       }),
       new CopyWebpackPlugin([
         {
@@ -77,6 +75,11 @@ module.exports = async (env, options) => {
         filename: "commands.html",
         template: "./src/commands/commands.html",
         chunks: ["commands"]
+      }),
+      new HtmlWebpackPlugin({
+        filename: "index.html",
+        template: "./src/index.html",
+        chunks: ["index"]
       }),
       new CopyWebpackPlugin([
         {
